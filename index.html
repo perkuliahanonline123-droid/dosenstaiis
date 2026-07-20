@@ -27,7 +27,7 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        .identitas-grid { display: grid; grid-template-columns: 140px 10px 1fr; gap: 4px; font-size: 13px; line-height: 1.4; }
+        .identitas-grid { display: grid; grid-template-columns: 180px 10px 1fr; gap: 4px; font-size: 13px; line-height: 1.4; }
         
         /* CSS TABEL PDF */
         .pdf-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11.5px; margin-top: 10px; }
@@ -191,7 +191,7 @@
                     <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 12mm 15mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
                         
                         <div style="font-weight: bold; font-size: 13px; margin-bottom: 6px;">I. IDENTITAS</div>
-                        <div id="pdf-identitas" style="display: grid; grid-template-columns: 180px 15px 1fr; gap: 3px; font-size: 12px; margin-bottom: 15px; line-height: 1.3;">
+                        <div id="pdf-identitas" style="display: grid; grid-template-columns: 200px 15px 1fr; gap: 3px; font-size: 12px; margin-bottom: 15px; line-height: 1.3;">
                             <!-- Diisi Otomatis -->
                         </div>
 
@@ -268,7 +268,6 @@
             }).catch(err => alert("Gagal terhubung ke database. Cek konfigurasi Script URL."));
         });
 
-        // FUNGSI INI SEKARANG INSTAN (Tidak ada loading)
         function loadDosenDetails() {
             const nama = document.getElementById("dosenDropdown").value;
             const card = document.getElementById("identitasCard");
@@ -285,21 +284,16 @@
             const d = allDosenData[nama];
             currentDosenDetail = d;
             
+            // Kode yang telah diubah agar sesuai dengan field dan urutan permintaan Anda
             const html = `
-                <div>Nama</div><div>:</div><div class="font-bold">${d.nama}</div>
-                <div>No. Sertifikat</div><div>:</div><div>${d.noSertifikat}</div>
-                <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi}</div>
-                <div>Status</div><div>:</div><div>${d.status}</div>
-                <div>Alamat PT</div><div>:</div><div>${d.alamatPT}</div>
-                <div>Jurusan</div><div>:</div><div>${d.jurusan}</div>
-                <div>Program Studi</div><div>:</div><div>${d.programStudi}</div>
-                <div>Jab. Fungsional/Gol.</div><div>:</div><div>${d.jabatan}</div>
-                <div>Tempat - Tgl Lahir</div><div>:</div><div>${d.tempatTglLahir}</div>
-                <div>S1</div><div>:</div><div>${d.s1}</div>
-                <div>S2</div><div>:</div><div>${d.s2}</div>
-                <div>S3</div><div>:</div><div>${d.s3}</div>
-                <div>Ilmu Yang Ditekuni</div><div>:</div><div>${d.ilmuDitekuni}</div>
-                <div>No. HP</div><div>:</div><div>${d.noHp}</div>
+                <div>Nama Dosen Beserta Gelar</div><div>:</div><div class="font-bold">${d.nama || '-'}</div>
+                <div>Tanggal Lahir</div><div>:</div><div>${d.tanggalLahir || '-'}</div>
+                <div>NUPTK</div><div>:</div><div>${d.nuptk || '-'}</div>
+                <div>Pendidikan Terakhir</div><div>:</div><div>${d.pendidikanTerakhir || '-'}</div>
+                <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi || '-'}</div>
+                <div>Jabatan/Unit Kerja</div><div>:</div><div>${d.jabatanUnitKerja || '-'}</div>
+                <div>Program Studi</div><div>:</div><div>${d.programStudi || '-'}</div>
+                <div>Jabatan Akademik</div><div>:</div><div>${d.jabatanAkademik || '-'}</div>
             `;
             container.innerHTML = html;
             document.getElementById('pdf-identitas').innerHTML = html;
