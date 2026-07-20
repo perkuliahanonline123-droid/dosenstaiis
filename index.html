@@ -227,16 +227,29 @@
         // MASUKKAN LINK WEB APP BARU DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
         
+        let allDosenData = {}; // Menyimpan data di memori browser
         let currentDosenDetail = {};
 
         document.addEventListener("DOMContentLoaded", () => {
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
+                if (data.status === "gagal") {
+                    alert("Error Database: " + data.pesan);
+                    return;
+                }
+
+                // 1. Simpan detail dosen di memori agar loading instan
+                allDosenData = data.detailDosen || {};
+
+                // 2. Isi Dropdown Dosen
                 const dropdown = document.getElementById("dosenDropdown");
                 dropdown.innerHTML = '<option value="">-- Pilih Nama Dosen --</option>';
-                if(data.dosen) data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
+                if(data.dosen) {
+                    data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
+                }
                 
+                // 3. Isi Checkbox Matkul
                 const mkContainer = document.getElementById("matkulCheckboxList");
                 mkContainer.innerHTML = '';
                 if(data.matkul) {
@@ -249,47 +262,50 @@
                         `;
                     });
                 }
+                
+                // 4. Render Riwayat
                 renderRiwayat(data.riwayat || []);
             }).catch(err => alert("Gagal terhubung ke database. Cek konfigurasi Script URL."));
         });
 
+        // FUNGSI INI SEKARANG INSTAN (Tidak ada loading)
         function loadDosenDetails() {
             const nama = document.getElementById("dosenDropdown").value;
             const card = document.getElementById("identitasCard");
             const container = document.getElementById("identitasContainer");
             
-            if (!nama) { card.classList.add("hidden"); return; }
+            if (!nama || !allDosenData[nama]) { 
+                card.classList.add("hidden"); 
+                currentDosenDetail = {};
+                return; 
+            }
 
-            container.innerHTML = `<div class="col-span-3 text-emerald-600"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil biodata...</div>`;
+            // Tampilkan kartu dan panggil data dari memori browser
             card.classList.remove("hidden");
-
-            fetch(`${SCRIPT_URL}?action=getDetail&nama=${encodeURIComponent(nama)}`)
-            .then(res => res.json())
-            .then(res => {
-                const d = res.data;
-                currentDosenDetail = d;
-                const html = `
-                    <div>Nama</div><div>:</div><div class="font-bold">${d.nama}</div>
-                    <div>No. Sertifikat</div><div>:</div><div>${d.noSertifikat}</div>
-                    <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi}</div>
-                    <div>Status</div><div>:</div><div>${d.status}</div>
-                    <div>Alamat PT</div><div>:</div><div>${d.alamatPT}</div>
-                    <div>Jurusan</div><div>:</div><div>${d.jurusan}</div>
-                    <div>Program Studi</div><div>:</div><div>${d.programStudi}</div>
-                    <div>Jab. Fungsional/Gol.</div><div>:</div><div>${d.jabatan}</div>
-                    <div>Tempat - Tgl Lahir</div><div>:</div><div>${d.tempatTglLahir}</div>
-                    <div>S1</div><div>:</div><div>${d.s1}</div>
-                    <div>S2</div><div>:</div><div>${d.s2}</div>
-                    <div>S3</div><div>:</div><div>${d.s3}</div>
-                    <div>Ilmu Yang Ditekuni</div><div>:</div><div>${d.ilmuDitekuni}</div>
-                    <div>No. HP</div><div>:</div><div>${d.noHp}</div>
-                `;
-                container.innerHTML = html;
-                document.getElementById('pdf-identitas').innerHTML = html;
-            });
+            const d = allDosenData[nama];
+            currentDosenDetail = d;
+            
+            const html = `
+                <div>Nama</div><div>:</div><div class="font-bold">${d.nama}</div>
+                <div>No. Sertifikat</div><div>:</div><div>${d.noSertifikat}</div>
+                <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi}</div>
+                <div>Status</div><div>:</div><div>${d.status}</div>
+                <div>Alamat PT</div><div>:</div><div>${d.alamatPT}</div>
+                <div>Jurusan</div><div>:</div><div>${d.jurusan}</div>
+                <div>Program Studi</div><div>:</div><div>${d.programStudi}</div>
+                <div>Jab. Fungsional/Gol.</div><div>:</div><div>${d.jabatan}</div>
+                <div>Tempat - Tgl Lahir</div><div>:</div><div>${d.tempatTglLahir}</div>
+                <div>S1</div><div>:</div><div>${d.s1}</div>
+                <div>S2</div><div>:</div><div>${d.s2}</div>
+                <div>S3</div><div>:</div><div>${d.s3}</div>
+                <div>Ilmu Yang Ditekuni</div><div>:</div><div>${d.ilmuDitekuni}</div>
+                <div>No. HP</div><div>:</div><div>${d.noHp}</div>
+            `;
+            container.innerHTML = html;
+            document.getElementById('pdf-identitas').innerHTML = html;
         }
 
-        // Fungsi Helper untuk membuat link (G-Drive) menjadi teks pendek yang bisa diklik di PDF
+        // Fungsi Helper Link
         function formatLink(url, label = "Buka Tautan") {
             if (!url) return "-";
             return `<a href="${url}" target="_blank" class="link-text">${label}</a>`;
