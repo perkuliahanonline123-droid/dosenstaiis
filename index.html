@@ -29,7 +29,7 @@
         
         .identitas-grid { display: grid; grid-template-columns: 180px 10px 1fr; gap: 4px; font-size: 13px; line-height: 1.4; }
         
-        /* CSS TABEL PDF DIPERBAIKI */
+        /* CSS TABEL PDF */
         .pdf-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11.5px; margin-top: 15px; }
         .pdf-table th, .pdf-table td { border: 1px solid black; padding: 6px 8px; text-align: center; vertical-align: middle;}
         .pdf-table th { font-weight: bold; background-color: #ffffff; }
@@ -161,8 +161,9 @@
 
         <!-- BAGIAN KANAN: RIWAYAT -->
         <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200">
+            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
                 <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
+                <span class="text-[10px] text-slate-400 italic">Klik untuk pratinjau</span>
             </div>
             <div id="historyTableContainer" class="overflow-y-auto max-h-[600px] custom-scrollbar">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
@@ -230,18 +231,16 @@
     </div>
 
     <script>
-        // MASUKKAN LINK WEB APP BARU DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
         
         let allDosenData = {}; 
         let currentDosenDetail = {};
+        let riwayatCache = []; // Menyimpan data riwayat untuk bisa diklik ulang
 
-        // Fungsi Memperbaiki Zona Waktu Tanggal
         function formatTanggal(isoString) {
             if (!isoString || isoString === '-') return '-';
             try {
                 const date = new Date(isoString);
-                // Validasi apakah tanggal valid
                 if (isNaN(date.getTime())) return isoString; 
                 
                 const hari = date.getDate();
@@ -251,7 +250,7 @@
                 
                 return `${hari} ${bulan} ${tahun}`;
             } catch(e) {
-                return isoString; // Kembalikan string asli jika gagal
+                return isoString;
             }
         }
 
@@ -285,7 +284,8 @@
                     });
                 }
                 
-                renderRiwayat(data.riwayat || []);
+                riwayatCache = data.riwayat || [];
+                renderRiwayat(riwayatCache);
             }).catch(err => alert("Gagal terhubung ke database. Cek konfigurasi Script URL."));
         });
 
@@ -323,6 +323,97 @@
             return `<a href="${url}" target="_blank" class="link-text">${label}</a>`;
         }
 
+        function generateTableContent(dataRinci) {
+            const tbody = document.getElementById("pdf-table-body");
+            let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
+
+            // Cek apakah data dari klik riwayat atau input manual form
+            const matkulArr = dataRinci.matkulList ? dataRinci.matkulList.split(', ') : [];
+            
+            matkulArr.forEach((mk, index) => {
+                tableHtml += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td class="text-left">${mk}</td>
+                        <td>${formatLink(dataRinci.st_dosen, "Surat Tugas")}</td>
+                        <td>2</td>
+                        <td>6 Bulan</td>
+                        <td>${formatLink(dataRinci.absen_nilai, "Absen & Nilai")}</td>
+                        <td>100</td>
+                        <td>SELESAI</td>
+                    </tr>
+                `;
+            });
+            
+            if(dataRinci.judul_penelitian) {
+                tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
+                tableHtml += `
+                    <tr>
+                        <td>1</td>
+                        <td class="text-left font-bold">${dataRinci.judul_penelitian}</td>
+                        <td>${formatLink(dataRinci.st_penelitian, "Surat Tugas Penelitian")}</td>
+                        <td>3</td>
+                        <td>6 Bulan</td>
+                        <td>${formatLink(dataRinci.lap_penelitian, "Laporan Penelitian")}</td>
+                        <td>100</td>
+                        <td>SELESAI</td>
+                    </tr>
+                `;
+            }
+
+            if(dataRinci.judul_pengabdian) {
+                tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
+                tableHtml += `
+                    <tr>
+                        <td>1</td>
+                        <td class="text-left font-bold">${dataRinci.judul_pengabdian}</td>
+                        <td>${formatLink(dataRinci.st_pengabdian, "Surat Tugas Pengabdian")}</td>
+                        <td>3</td>
+                        <td>6 Bulan</td>
+                        <td>${formatLink(dataRinci.lap_pengabdian, "Laporan Pengabdian")}</td>
+                        <td>100</td>
+                        <td>SELESAI</td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = tableHtml;
+        }
+
+        function bukaPratinjauDariRiwayat(index) {
+            const item = riwayatCache[index];
+            if (!item) return;
+
+            // Cari detail dosen dari memori berdasarkan nama di riwayat
+            const d = allDosenData[item.namaDosen];
+            if (!d) {
+                alert("Data detail dosen tidak ditemukan di sistem.");
+                return;
+            }
+
+            currentDosenDetail = d;
+
+            // Render identitas ke template PDF
+            const html = `
+                <div>Nama Dosen Beserta Gelar</div><div>:</div><div class="font-bold">${d.nama || '-'}</div>
+                <div>Tanggal Lahir</div><div>:</div><div>${formatTanggal(d.tanggalLahir)}</div>
+                <div>NUPTK</div><div>:</div><div>${d.nuptk || '-'}</div>
+                <div>Pendidikan Terakhir</div><div>:</div><div>${d.pendidikanTerakhir || '-'}</div>
+                <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi || '-'}</div>
+                <div>Jabatan/Unit Kerja</div><div>:</div><div>${d.jabatanUnitKerja || '-'}</div>
+                <div>Program Studi</div><div>:</div><div>${d.programStudi || '-'}</div>
+                <div>Jabatan Akademik</div><div>:</div><div>${d.jabatanAkademik || '-'}</div>
+            `;
+            document.getElementById('pdf-identitas').innerHTML = html;
+
+            // Buat isi tabel berdasarkan data riwayat yang disimpan
+            generateTableContent(item);
+
+            // Munculkan Modal Pratinjau
+            document.getElementById('preview-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
         function siapkanLaporan() {
             const nama = document.getElementById("dosenDropdown").value;
             const smt = document.getElementById("semester").value;
@@ -333,11 +424,9 @@
 
             const st_dosen = document.getElementById("st_dosen").value;
             const absen_nilai = document.getElementById("absen_nilai").value;
-
             const judul_pen = document.getElementById("judul_penelitian").value.trim();
             const st_pen = document.getElementById("st_penelitian").value.trim();
             const lap_pen = document.getElementById("lap_penelitian").value.trim();
-
             const judul_peng = document.getElementById("judul_pengabdian").value.trim();
             const st_peng = document.getElementById("st_pengabdian").value.trim();
             const lap_peng = document.getElementById("lap_pengabdian").value.trim();
@@ -346,74 +435,26 @@
                 alert("Mohon isi Link Surat Tugas Dosen dan Link Absen/Nilai pada Bidang Pendidikan."); return;
             }
 
-            const tbody = document.getElementById("pdf-table-body");
-            let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
+            const dataPaket = {
+                namaDosen: nama,
+                semester: smt,
+                matkulList: checked.join(', '),
+                st_dosen: st_dosen,
+                absen_nilai: absen_nilai,
+                judul_penelitian: judul_pen,
+                st_penelitian: st_pen,
+                lap_penelitian: lap_pen,
+                judul_pengabdian: judul_peng,
+                st_pengabdian: st_peng,
+                lap_pengabdian: lap_peng
+            };
 
-            // Row Pendidikan (Menghilangkan angka 1 yang nyasar di Capaian)
-            checked.forEach((mk, index) => {
-                tableHtml += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td class="text-left">${mk}</td>
-                        <td>${formatLink(st_dosen, "Surat Tugas")}</td>
-                        <td>2</td>
-                        <td>6 Bulan</td>
-                        <td>${formatLink(absen_nilai, "Absen & Nilai")}</td>
-                        <td>100</td>
-                        <td>SELESAI</td>
-                    </tr>
-                `;
-            });
-            
-            // Row Penelitian (SKS Diisi 3)
-            if(judul_pen) {
-                tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
-                tableHtml += `
-                    <tr>
-                        <td>1</td>
-                        <td class="text-left font-bold">${judul_pen}</td>
-                        <td>${formatLink(st_pen, "Surat Tugas Penelitian")}</td>
-                        <td>3</td>
-                        <td>6 Bulan</td>
-                        <td>${formatLink(lap_pen, "Laporan Penelitian")}</td>
-                        <td>100</td>
-                        <td>SELESAI</td>
-                    </tr>
-                `;
-            }
+            generateTableContent(dataPaket);
 
-            // Row Pengabdian (SKS Diisi 3)
-            if(judul_peng) {
-                tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
-                tableHtml += `
-                    <tr>
-                        <td>1</td>
-                        <td class="text-left font-bold">${judul_peng}</td>
-                        <td>${formatLink(st_peng, "Surat Tugas Pengabdian")}</td>
-                        <td>3</td>
-                        <td>6 Bulan</td>
-                        <td>${formatLink(lap_peng, "Laporan Pengabdian")}</td>
-                        <td>100</td>
-                        <td>SELESAI</td>
-                    </tr>
-                `;
-            }
-
-            tbody.innerHTML = tableHtml;
-
-            // Simpan Data Ke Spreadsheet
             const formData = new URLSearchParams();
-            formData.append('namaDosen', nama);
-            formData.append('semester', smt);
-            formData.append('matkulList', checked.join(', '));
-            formData.append('st_dosen', st_dosen);
-            formData.append('absen_nilai', absen_nilai);
-            formData.append('judul_penelitian', judul_pen);
-            formData.append('st_penelitian', st_pen);
-            formData.append('lap_penelitian', lap_pen);
-            formData.append('judul_pengabdian', judul_peng);
-            formData.append('st_pengabdian', st_peng);
-            formData.append('lap_pengabdian', lap_peng);
+            for (let key in dataPaket) {
+                formData.append(key, dataPaket[key]);
+            }
             
             const btn = document.getElementById("btn-submit");
             const temp = btn.innerHTML;
@@ -422,9 +463,16 @@
 
             fetch(SCRIPT_URL, { method: 'POST', body: formData })
             .then(res => res.json())
-            .then(() => {
+            .then(resData => {
                 btn.innerHTML = temp;
                 btn.disabled = false;
+                
+                // Tambahkan data baru ke cache riwayat secara real-time
+                if(resData.riwayat) {
+                    riwayatCache = resData.riwayat;
+                    renderRiwayat(riwayatCache);
+                }
+
                 document.getElementById('preview-modal').classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             }).catch(e => {
@@ -453,7 +501,7 @@
             wrapper.style.top = '0';
             wrapper.style.left = '0';
             wrapper.style.width = '297mm'; 
-            wrapper.style.zIndex = '-999'; // Disembunyikan di background
+            wrapper.style.zIndex = '-999';
             
             wrapper.appendChild(clone);
             document.body.appendChild(wrapper);
@@ -480,13 +528,16 @@
                 return;
             }
             let html = '';
-            riwayatList.slice(0, 10).forEach(item => {
+            riwayatList.slice(0, 10).forEach((item, index) => {
                 let dateStr = new Date(item.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
                 html += `
-                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+                    <tr onclick="bukaPratinjauDariRiwayat(${index})" class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100 cursor-pointer group">
                         <td class="p-4 align-top">
-                            <div class="text-[10px] font-bold text-slate-400 mb-1">${dateStr}</div>
-                            <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-slate-400">${dateStr}</span>
+                                <span class="text-[10px] text-emerald-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-eye mr-1"></i> Pratinjau</span>
+                            </div>
+                            <div class="text-sm font-bold text-slate-800 group-hover:text-emerald-800 transition-colors">${item.namaDosen}</div>
                             <div class="text-xs text-slate-500 mt-1 line-clamp-1" title="${item.kegiatan}">${item.kegiatan}</div>
                         </td>
                     </tr>
