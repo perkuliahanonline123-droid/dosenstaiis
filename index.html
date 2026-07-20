@@ -154,8 +154,13 @@
 
         <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
             <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
-                <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
-                <span class="text-[10px] text-slate-400 italic">Klik untuk pratinjau</span>
+                <div class="flex items-center gap-3">
+                    <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
+                    <button type="button" id="btn-refresh" onclick="refreshRiwayat()" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Riwayat">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <span class="text-[10px] text-slate-400 italic hidden md:inline">Klik untuk pratinjau</span>
             </div>
             <div id="historyTableContainer" class="overflow-y-auto max-h-[600px] custom-scrollbar">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
@@ -185,10 +190,9 @@
             <div class="p-6 bg-slate-300 flex justify-center overflow-x-auto custom-scrollbar">
                 <div id="pdf-template-wrapper" class="shadow-2xl bg-white">
                     
-                    <!-- PADDING DIKURANGI DARI 15mm DUMMY MENJADI 8mm 12mm UNTUK MENCEGAH PECAH HALAMAN -->
                     <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 8mm 12mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
                         
-                        <!-- KOP SURAT (SPASI & FONT DIPATENKAN LEBIH RINGKAS) -->
+                        <!-- KOP SURAT -->
                         <div style="text-align: center; line-height: 1.1;">
                             <div style="font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
                             <div style="font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
@@ -259,6 +263,76 @@
             } catch(e) {
                 return isoString;
             }
+        }
+
+        function renderRiwayat(riwayatList) {
+            const tbody = document.getElementById("historyBody");
+            if (!riwayatList || riwayatList.length === 0) {
+                tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500">Belum ada riwayat.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            riwayatList.forEach((item, index) => {
+                // Ambil daftar matkul dengan fallback nama kolom
+                const matkul = item.matkulList || item.Matkul || item['Mata Kuliah'] || item.kegiatan || '-';
+                
+                // Rapikan format tanggal (dari format ISO ke lokal)
+                let tglFormat = item.tanggal || '-';
+                if(item.tanggal && item.tanggal !== '-') {
+                    try {
+                        const d = new Date(item.tanggal);
+                        if (!isNaN(d.getTime())) {
+                            const opsiTgl = { day: '2-digit', month: 'short', year: 'numeric' };
+                            const opsiWkt = { hour: '2-digit', minute: '2-digit' };
+                            tglFormat = `${d.toLocaleDateString('id-ID', opsiTgl)} ${d.toLocaleTimeString('id-ID', opsiWkt)}`;
+                        }
+                    } catch(e) {}
+                }
+
+                html += `
+                    <tr onclick="bukaPratinjauDariRiwayat(${index})" class="hover:bg-slate-50 cursor-pointer transition">
+                        <td class="px-5 py-4">
+                            <div class="font-bold text-xs text-slate-800">${item.namaDosen || '-'}</div>
+                            <div class="text-[11px] text-slate-500 mt-1">${item.semester || '-'} • ${tglFormat}</div>
+                            <div class="text-[11px] text-emerald-700 font-medium mt-1.5 truncate" title="${matkul}">
+                                <i class="fas fa-book-open mr-1"></i> ${matkul}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function refreshRiwayat() {
+            const btnRefresh = document.getElementById("btn-refresh");
+            const icon = btnRefresh.querySelector("i");
+            const tbody = document.getElementById("historyBody");
+
+            // Animasi loading
+            icon.classList.add("fa-spin");
+            btnRefresh.disabled = true;
+            tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat pembaruan...</td></tr>`;
+
+            // Panggil ulang database
+            fetch(SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                icon.classList.remove("fa-spin");
+                btnRefresh.disabled = false;
+                
+                if (data.status === "sukses" && data.riwayat) {
+                    riwayatCache = data.riwayat;
+                    renderRiwayat(riwayatCache);
+                } else {
+                    renderRiwayat(riwayatCache); // Kembalikan ke riwayat lama jika gagal
+                }
+            }).catch(err => {
+                icon.classList.remove("fa-spin");
+                btnRefresh.disabled = false;
+                renderRiwayat(riwayatCache);
+            });
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -563,28 +637,12 @@
                 document.body.removeChild(wrapper);
                 btnCetak.innerHTML = `<i class="fas fa-file-pdf"></i> Cetak PDF`;
                 btnCetak.disabled = false;
+            }).catch(err => {
+                document.body.removeChild(wrapper);
+                btnCetak.innerHTML = `<i class="fas fa-file-pdf"></i> Cetak PDF`;
+                btnCetak.disabled = false;
+                alert("Gagal mencetak PDF.");
             });
-        }
-
-        function renderRiwayat(riwayatList) {
-            const tbody = document.getElementById("historyBody");
-            if (!riwayatList || riwayatList.length === 0) {
-                tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500">Belum ada riwayat.</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            riwayatList.forEach((item, index) => {
-                html += `
-                    <tr onclick="bukaPratinjauDariRiwayat(${index})" class="hover:bg-slate-50 cursor-pointer transition">
-                        <td class="px-5 py-4">
-                            <div class="font-bold text-xs text-slate-800">${item.namaDosen || '-'}</div>
-                            <div class="text-[11px] text-slate-500 mt-1">${item.semester || '-'} • ${item.tanggal || '-'}</div>
-                        </td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
         }
     </script>
 </body>
