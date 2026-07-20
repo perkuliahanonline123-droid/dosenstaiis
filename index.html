@@ -222,9 +222,10 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
         
         let allDosenData = {}; 
+        let allSksData = {}; // Menyimpan data SKS Kurikulum
         let currentDosenDetail = {};
         let riwayatCache = [];
-        let localFormCache = {}; // Untuk menyimpan data form yang utuh secara lokal
+        let localFormCache = {}; 
 
         function formatTanggal(isoString) {
             if (!isoString || isoString === '-') return '-';
@@ -253,6 +254,7 @@
                 }
 
                 allDosenData = data.detailDosen || {};
+                allSksData = data.sksData || {};
 
                 const dropdown = document.getElementById("dosenDropdown");
                 dropdown.innerHTML = '<option value="">-- Pilih Nama Dosen --</option>';
@@ -316,7 +318,6 @@
             const tbody = document.getElementById("pdf-table-body");
             let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
 
-            // Helper untuk mengambil value dengan penamaan kunci fleksibel 
             const getVal = (keys) => {
                 for (let k of keys) {
                     if (dataRinci[k] !== undefined && dataRinci[k] !== null && dataRinci[k] !== "") return dataRinci[k];
@@ -324,7 +325,6 @@
                 return "";
             };
 
-            // Tambahkan variasi penamaan kunci JSON (camelCase/spasi) sesuai kebiasaan Google Apps Script
             const rawMatkul = getVal(['matkulList', 'Matkul', 'Kegiatan', 'kegiatan', 'Mata Kuliah', 'mataKuliah']);
             const matkulArr = rawMatkul && rawMatkul.trim() !== "" ? rawMatkul.split(', ') : [];
             
@@ -333,15 +333,16 @@
 
             if(matkulArr.length > 0 && matkulArr[0] !== "-") {
                 matkulArr.forEach((mk, index) => {
+                    let sksValue = allSksData[mk.trim()] || '-';
                     tableHtml += `
                         <tr>
                             <td>${index + 1}</td>
                             <td class="text-left">${mk}</td>
                             <td>${formatLink(stDosen, "Surat Tugas")}</td>
-                            <td>2</td>
+                            <td>${sksValue}</td>
                             <td>6 Bulan</td>
                             <td>${formatLink(absenNilai, "Absen & Nilai")}</td>
-                            <td>100 &nbsp; 1</td>
+                            <td>100</td>
                             <td>SELESAI</td>
                         </tr>
                     `;
@@ -366,7 +367,6 @@
             const stPen = getVal(['st_penelitian', 'Surat Tugas Penelitian', 'ST Penelitian', 'suratTugasPenelitian']);
             const lapPen = getVal(['lap_penelitian', 'Laporan Penelitian', 'laporanPenelitian']);
             
-            // Logika pengecekan apakah ada isian penelitian
             const isPenFilled = (judulPen !== '-' && judulPen.trim() !== '');
 
             tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
@@ -388,7 +388,6 @@
             const stPeng = getVal(['st_pengabdian', 'Surat Tugas Pengabdian', 'ST Pengabdian', 'suratTugasPengabdian']);
             const lapPeng = getVal(['lap_pengabdian', 'Laporan Pengabdian', 'laporanPengabdian']);
             
-            // Logika pengecekan apakah ada isian pengabdian
             const isPengFilled = (judulPeng !== '-' && judulPeng.trim() !== '');
 
             tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
@@ -412,8 +411,6 @@
             let item = riwayatCache[index];
             if (!item) return;
 
-            // Gabungkan objek riwayat dengan data utuh di cache lokal (jika ada) 
-            // agar data tautan dan form tidak hilang menjadi " - "
             if (localFormCache[item.namaDosen]) {
                 item = { ...localFormCache[item.namaDosen], ...item };
             }
@@ -479,7 +476,6 @@
                 lap_pengabdian: lap_peng
             };
 
-            // Menyimpan form utuh di cache memori lokal sehingga tetap utuh kalau riwayat diklik
             localFormCache[nama] = dataPaket;
 
             generateTableContent(dataPaket);
