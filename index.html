@@ -16,126 +16,148 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
-                    boxShadow: { 'timbul': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)' }
+                    boxShadow: { 'timbul': '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }
                 }
             }
         }
     </script>
     <style>
         body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
-        html { scroll-behavior: smooth; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
         .identitas-grid { display: grid; grid-template-columns: 140px 10px 1fr; gap: 4px; font-size: 13px; line-height: 1.4; }
         
-        /* CSS KHUSUS TABEL PDF */
+        /* CSS TABEL PDF */
         .pdf-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11.5px; margin-top: 10px; }
         .pdf-table th, .pdf-table td { border: 1.5px solid black; padding: 4px 6px; text-align: center; vertical-align: middle;}
         .pdf-table th { font-weight: bold; }
         .pdf-table .text-left { text-align: left; }
         .pdf-table .font-bold { font-weight: bold; }
         .pdf-table .bg-gray { background-color: #f9fafb; font-weight: bold; text-align: left; padding-left: 10px;}
+        .link-text { color: #2563eb; text-decoration: underline; font-size: 10px; word-break: break-all;}
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
 
-    <header class="w-full bg-emerald-800 text-white px-6 md:px-10 py-10 rounded-b-[1.5rem] shadow-timbul relative overflow-hidden animate-slide-up z-10">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+    <header class="w-full bg-emerald-800 text-white px-6 md:px-10 py-10 rounded-b-[1.5rem] shadow-timbul relative z-10">
         <div class="relative z-10 flex flex-col items-start text-left w-full mx-auto">
-            <span class="text-[10px] md:text-xs font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 inline-block">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
-            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-white">Laporan Kinerja Dosen Terpadu</h1>
-            <p class="text-emerald-100 text-sm md:text-base mt-2 md:mt-3 max-w-2xl font-normal">Lengkapi form Pendidikan, Penelitian, dan Pengabdian untuk menyusun dokumen BKD.</p>
+            <span class="text-[10px] md:text-xs font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
+            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-white">Laporan Beban Kinerja Dosen</h1>
+            <p class="text-emerald-100 text-sm md:text-base mt-2 max-w-2xl">Lengkapi form identitas, pengajaran, penelitian, dan pengabdian di bawah ini.</p>
         </div>
     </header>
 
-    <main class="w-full mx-auto px-6 md:px-10 mt-8 relative z-20 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <main class="w-full mx-auto px-6 md:px-10 mt-8 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- KIRI: FORMULIR -->
-        <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full animate-slide-up">
+        <!-- BAGIAN KIRI: FORMULIR UTAMA -->
+        <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full">
             
-            <!-- 1. IDENTITAS -->
-            <div class="mb-6">
-                <label class="block mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">I. Pilih Dosen <span class="text-emerald-600">*</span></label>
-                <div class="relative">
-                    <select id="dosenDropdown" onchange="loadDosenDetails()" class="bg-white border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3.5 outline-none transition-all shadow-sm appearance-none cursor-pointer">
-                        <option value="">-- Menghubungkan ke Database... --</option>
-                    </select>
-                    <i class="fas fa-chevron-down absolute right-4 top-4 text-slate-400 pointer-events-none"></i>
+            <!-- I. IDENTITAS DOSEN -->
+            <div class="mb-8 border-b border-slate-200 pb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-user-tie mr-2"></i>I. Identitas Dosen</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Pilih Nama Dosen <span class="text-emerald-600">*</span></label>
+                        <select id="dosenDropdown" onchange="loadDosenDetails()" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="">-- Menghubungkan ke Database... --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Semester <span class="text-emerald-600">*</span></label>
+                        <select id="semester" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="" disabled selected>Pilih Semester...</option>
+                            <option value="Ganjil">Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Kartu Sub Identitas Muncul Disini -->
+                <div id="identitasCard" class="hidden mt-5 bg-slate-50 border border-slate-200 rounded-lg p-5 shadow-inner">
+                    <h3 class="text-xs font-bold uppercase text-emerald-700 mb-4 border-b border-slate-200 pb-2">Sub Identitas</h3>
+                    <div class="identitas-grid text-slate-700" id="identitasContainer"></div>
                 </div>
             </div>
 
-            <!-- Kartu Sub Identitas -->
-            <div id="identitasCard" class="hidden bg-slate-50 border border-slate-200 rounded-lg p-5 mb-8 shadow-inner">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-4 border-b border-slate-200 pb-2"><i class="fas fa-id-card mr-2"></i> Sub Identitas</h3>
-                <div class="identitas-grid text-slate-700" id="identitasContainer"></div>
-            </div>
-
-            <!-- 2. PENDIDIKAN (MATA KULIAH) -->
-            <div class="mb-8">
-                <label class="block mb-3 text-xs font-bold uppercase tracking-wider text-slate-600">II. Bidang Pendidikan (Pilih Mata Kuliah) <span class="text-emerald-600">*</span></label>
-                <div class="bg-white border border-slate-200 rounded-lg p-5 max-h-60 overflow-y-auto custom-scrollbar shadow-inner">
+            <!-- II. PENDIDIKAN (PENGAJARAN) -->
+            <div class="mb-8 border-b border-slate-200 pb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-chalkboard-teacher mr-2"></i>II. Bidang Pendidikan</h2>
+                
+                <label class="block mb-3 text-xs font-bold uppercase text-slate-600">Mata Kuliah Yang Diampu <span class="text-emerald-600">*</span></label>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 max-h-52 overflow-y-auto custom-scrollbar shadow-inner mb-5">
                     <div id="matkulCheckboxList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        <p class="text-xs text-slate-500 animate-pulse col-span-full">Menghubungkan ke database...</p>
+                        <p class="text-xs text-slate-500">Memuat mata kuliah...</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- 3. PENELITIAN -->
-            <div class="mb-8 bg-slate-50 border border-slate-200 rounded-lg p-5 shadow-inner">
-                <label class="block mb-4 text-xs font-bold uppercase tracking-wider text-emerald-700 border-b border-slate-200 pb-2">III. Bidang Penelitian (Opsional)</label>
-                <div class="grid grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label class="block mb-1 text-[11px] font-bold text-slate-500">Judul Penelitian</label>
-                        <input type="text" id="penelitian_judul" class="w-full p-2.5 text-sm border border-slate-300 rounded-md focus:ring-emerald-500 outline-none" placeholder="Contoh: Penelitian Dasar Pengembangan Prodi">
+                        <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Link Surat Tugas Dosen (G-Drive) <span class="text-emerald-600">*</span></label>
+                        <input type="url" id="st_dosen" class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none" placeholder="https://drive.google.com/...">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Penugasan (SK)</label>
-                            <input type="text" id="penelitian_sk" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: SK Rektor No 060 Tahun 2026">
-                        </div>
-                        <div>
-                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Kinerja</label>
-                            <input type="text" id="penelitian_bukti" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: Laporan Penelitian">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. PENGABDIAN -->
-            <div class="mb-6 bg-slate-50 border border-slate-200 rounded-lg p-5 shadow-inner">
-                <label class="block mb-4 text-xs font-bold uppercase tracking-wider text-emerald-700 border-b border-slate-200 pb-2">IV. Bidang Pengabdian (Opsional)</label>
-                <div class="grid grid-cols-1 gap-4">
                     <div>
-                        <label class="block mb-1 text-[11px] font-bold text-slate-500">Judul Kegiatan Pengabdian</label>
-                        <input type="text" id="pengabdian_judul" class="w-full p-2.5 text-sm border border-slate-300 rounded-md focus:ring-emerald-500 outline-none" placeholder="Contoh: Penyuluhan Hukum Keluarga di Desa">
+                        <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Link Absen dan Nilai (G-Drive) <span class="text-emerald-600">*</span></label>
+                        <input type="url" id="absen_nilai" class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none" placeholder="https://drive.google.com/...">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+            </div>
+
+            <!-- III. PENELITIAN -->
+            <div class="mb-8 border-b border-slate-200 pb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-microscope mr-2"></i>III. Bidang Penelitian</h2>
+                <div class="grid grid-cols-1 gap-5">
+                    <div>
+                        <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Judul Penelitian</label>
+                        <input type="text" id="judul_penelitian" class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none" placeholder="Masukkan judul penelitian...">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Penugasan (SK)</label>
-                            <input type="text" id="pengabdian_sk" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: Surat Tugas Dekan">
+                            <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Link Surat Tugas Penelitian</label>
+                            <input type="url" id="st_penelitian" class="w-full p-3 text-sm border border-slate-300 rounded-lg outline-none" placeholder="https://drive.google.com/...">
                         </div>
                         <div>
-                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Kinerja</label>
-                            <input type="text" id="pengabdian_bukti" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: Laporan Kegiatan">
+                            <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Link Laporan Penelitian</label>
+                            <input type="url" id="lap_penelitian" class="w-full p-3 text-sm border border-slate-300 rounded-lg outline-none" placeholder="https://drive.google.com/...">
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- IV. PENGABDIAN -->
+            <div class="mb-6">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-hands-helping mr-2"></i>IV. Bidang Pengabdian Masyarakat</h2>
+                <div class="grid grid-cols-1 gap-5">
+                    <div>
+                        <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Judul Pengabdian</label>
+                        <input type="text" id="judul_pengabdian" class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none" placeholder="Masukkan judul pengabdian...">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Link Surat Tugas Pengabdian</label>
+                            <input type="url" id="st_pengabdian" class="w-full p-3 text-sm border border-slate-300 rounded-lg outline-none" placeholder="https://drive.google.com/...">
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-[11px] font-bold text-slate-500 uppercase">Link Laporan Pengabdian</label>
+                            <input type="url" id="lap_pengabdian" class="w-full p-3 text-sm border border-slate-300 rounded-lg outline-none" placeholder="https://drive.google.com/...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOMBOL SUBMIT -->
             <div class="pt-6 border-t border-slate-100 flex justify-end">
-                <button type="button" id="btn-submit" onclick="siapkanLaporan()" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-200 font-bold rounded-lg text-xs uppercase tracking-wider px-6 py-3.5 transition-all flex items-center gap-2 shadow-md">
+                <button type="button" id="btn-submit" onclick="siapkanLaporan()" class="text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-lg text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-md">
                     <i class="fas fa-file-signature"></i> Buat Laporan & Pratinjau
                 </button>
             </div>
         </div>
 
-        <!-- KANAN: RIWAYAT -->
-        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden animate-slide-up sticky top-8">
+        <!-- BAGIAN KANAN: RIWAYAT -->
+        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
             <div class="bg-slate-50 px-6 py-5 border-b border-slate-200">
-                <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log Laporan Terakhir</h2>
+                <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
             </div>
             <div id="historyTableContainer" class="overflow-y-auto max-h-[600px] custom-scrollbar">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
@@ -147,17 +169,17 @@
         </div>
     </main>
 
-    <!-- MODAL PRATINJAU PDF (UKURAN LEBIH LEBAR UNTUK LANDSCAPE) -->
+    <!-- MODAL PRATINJAU PDF (LANDSCAPE) -->
     <div id="preview-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm overflow-y-auto flex items-start justify-center pt-8 pb-10 px-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-[1000px] overflow-hidden flex flex-col animate-slide-up mt-2">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-[1000px] overflow-hidden flex flex-col mt-2">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-2 text-slate-700">
                     <i class="fas fa-search text-emerald-600"></i>
                     <h3 class="font-bold text-sm uppercase tracking-wider">Pratinjau Laporan Kinerja</h3>
                 </div>
                 <div class="flex gap-3">
-                    <button type="button" onclick="tutupPratinjau()" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">Tutup</button>
-                    <button type="button" id="btn-cetak" onclick="cetakPDF()" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
+                    <button type="button" onclick="tutupPratinjau()" class="px-4 py-2 text-xs font-semibold uppercase text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">Tutup</button>
+                    <button type="button" id="btn-cetak" onclick="cetakPDF()" class="px-4 py-2 text-xs font-bold uppercase text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
                         <i class="fas fa-file-pdf"></i> Cetak PDF
                     </button>
                 </div>
@@ -166,25 +188,22 @@
             <div class="p-6 bg-slate-200 flex justify-center overflow-x-auto custom-scrollbar">
                 <div class="shadow-xl flex-shrink-0 bg-white">
                     
-                    <!-- KERTAS A4 LANDSCAPE -->
                     <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 12mm 15mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
                         
-                        <!-- I. IDENTITAS -->
                         <div style="font-weight: bold; font-size: 13px; margin-bottom: 6px;">I. IDENTITAS</div>
                         <div id="pdf-identitas" style="display: grid; grid-template-columns: 180px 15px 1fr; gap: 3px; font-size: 12px; margin-bottom: 15px; line-height: 1.3;">
                             <!-- Diisi Otomatis -->
                         </div>
 
-                        <!-- TABEL KINERJA -->
                         <table class="pdf-table">
                             <thead>
                                 <tr>
                                     <th rowspan="2" style="width: 30px;">No</th>
-                                    <th rowspan="2" style="width: 300px;">Kegiatan</th>
+                                    <th rowspan="2" style="width: 280px;">Kegiatan</th>
                                     <th colspan="2">Beban Kerja</th>
                                     <th rowspan="2" style="width: 110px;">Masa Pelaksanaan<br>Tugas</th>
                                     <th colspan="2">Kinerja</th>
-                                    <th rowspan="2" style="width: 140px;">Penilaian/Rekomendasi Asesor</th>
+                                    <th rowspan="2" style="width: 120px;">Penilaian/Rekomendasi<br>Asesor</th>
                                 </tr>
                                 <tr>
                                     <th style="width: 140px;">Bukti Penugasan</th>
@@ -204,7 +223,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIC -->
     <script>
         // MASUKKAN LINK WEB APP BARU DI SINI
         const SCRIPT_URL = 'LINK_APPS_SCRIPT_ANDA_DISINI';
@@ -215,28 +233,24 @@
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
-                // Dropdown Dosen
                 const dropdown = document.getElementById("dosenDropdown");
                 dropdown.innerHTML = '<option value="">-- Pilih Nama Dosen --</option>';
                 if(data.dosen) data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
                 
-                // Daftar Mata Kuliah
                 const mkContainer = document.getElementById("matkulCheckboxList");
                 mkContainer.innerHTML = '';
                 if(data.matkul) {
                     data.matkul.forEach(mk => {
                         mkContainer.innerHTML += `
-                            <label class="flex items-start space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer hover:text-emerald-700 transition-colors">
-                                <input type="checkbox" name="matakuliah" value="${mk}" class="mt-0.5 w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500 accent-emerald-600 shrink-0">
+                            <label class="flex items-start space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer">
+                                <input type="checkbox" name="matakuliah" value="${mk}" class="mt-0.5 w-4 h-4 text-emerald-600 border-slate-300 rounded accent-emerald-600 shrink-0">
                                 <span class="leading-tight">${mk}</span>
                             </label>
                         `;
                     });
                 }
-
-                // Render Riwayat
                 renderRiwayat(data.riwayat || []);
-            }).catch(err => alert("Gagal terhubung ke database."));
+            }).catch(err => alert("Gagal terhubung ke database. Cek konfigurasi Script URL."));
         });
 
         function loadDosenDetails() {
@@ -246,7 +260,7 @@
             
             if (!nama) { card.classList.add("hidden"); return; }
 
-            container.innerHTML = `<div class="col-span-3 text-emerald-600 animate-pulse"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil biodata...</div>`;
+            container.innerHTML = `<div class="col-span-3 text-emerald-600"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil biodata...</div>`;
             card.classList.remove("hidden");
 
             fetch(`${SCRIPT_URL}?action=getDetail&nama=${encodeURIComponent(nama)}`)
@@ -275,69 +289,82 @@
             });
         }
 
+        // Fungsi Helper untuk membuat link (G-Drive) menjadi teks pendek yang bisa diklik di PDF
+        function formatLink(url, label = "Buka Tautan") {
+            if (!url) return "-";
+            return `<a href="${url}" target="_blank" class="link-text">${label}</a>`;
+        }
+
         function siapkanLaporan() {
             const nama = document.getElementById("dosenDropdown").value;
-            if(!nama || !currentDosenDetail.nama) { alert("Pilih dosen terlebih dahulu."); return; }
+            const smt = document.getElementById("semester").value;
+            if(!nama || !smt || !currentDosenDetail.nama) { alert("Pilih Dosen dan Semester terlebih dahulu."); return; }
 
             const checked = Array.from(document.querySelectorAll('input[name="matakuliah"]:checked')).map(cb => cb.value);
             if(checked.length === 0) { alert("Centang minimal satu mata kuliah."); return; }
 
-            // Ambil Data Penelitian & Pengabdian
-            const pen_judul = document.getElementById("penelitian_judul").value.trim();
-            const pen_sk = document.getElementById("penelitian_sk").value.trim();
-            const pen_bukti = document.getElementById("penelitian_bukti").value.trim();
+            const st_dosen = document.getElementById("st_dosen").value;
+            const absen_nilai = document.getElementById("absen_nilai").value;
 
-            const peng_judul = document.getElementById("pengabdian_judul").value.trim();
-            const peng_sk = document.getElementById("pengabdian_sk").value.trim();
-            const peng_bukti = document.getElementById("pengabdian_bukti").value.trim();
+            const judul_pen = document.getElementById("judul_penelitian").value.trim();
+            const st_pen = document.getElementById("st_penelitian").value.trim();
+            const lap_pen = document.getElementById("lap_penelitian").value.trim();
+
+            const judul_peng = document.getElementById("judul_pengabdian").value.trim();
+            const st_peng = document.getElementById("st_pengabdian").value.trim();
+            const lap_peng = document.getElementById("lap_pengabdian").value.trim();
+
+            if(!st_dosen || !absen_nilai) {
+                alert("Mohon isi Link Surat Tugas Dosen dan Link Absen/Nilai pada Bidang Pendidikan."); return;
+            }
 
             const tbody = document.getElementById("pdf-table-body");
             let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
 
-            // Render Baris Mata Kuliah
+            // Row Pendidikan
             checked.forEach((mk, index) => {
                 tableHtml += `
                     <tr>
                         <td>${index + 1}</td>
                         <td class="text-left">${mk}</td>
-                        <td>Roster 2026</td>
+                        <td>${formatLink(st_dosen, "Surat Tugas")}</td>
                         <td>2</td>
                         <td>6 Bulan</td>
-                        <td>Absen dan Nilai</td>
-                        <td>100 &nbsp;&nbsp;&nbsp; 1</td>
+                        <td>${formatLink(absen_nilai, "Absen & Nilai")}</td>
+                        <td>100 &nbsp;&nbsp; 1</td>
                         <td>SELESAI</td>
                     </tr>
                 `;
             });
             
-            // Render Baris Penelitian
-            if(pen_judul) {
+            // Row Penelitian
+            if(judul_pen) {
                 tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
                 tableHtml += `
                     <tr>
                         <td>1</td>
-                        <td class="text-left font-bold">${pen_judul}</td>
-                        <td>${pen_sk.replace(/\n/g, '<br>')}</td>
+                        <td class="text-left font-bold">${judul_pen}</td>
+                        <td>${formatLink(st_pen, "Surat Tugas Penelitian")}</td>
                         <td></td>
                         <td>6 Bulan</td>
-                        <td>${pen_bukti}</td>
+                        <td>${formatLink(lap_pen, "Laporan Penelitian")}</td>
                         <td>100</td>
                         <td>SELESAI</td>
                     </tr>
                 `;
             }
 
-            // Render Baris Pengabdian
-            if(peng_judul) {
+            // Row Pengabdian
+            if(judul_peng) {
                 tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
                 tableHtml += `
                     <tr>
                         <td>1</td>
-                        <td class="text-left font-bold">${peng_judul}</td>
-                        <td>${peng_sk.replace(/\n/g, '<br>')}</td>
+                        <td class="text-left font-bold">${judul_peng}</td>
+                        <td>${formatLink(st_peng, "Surat Tugas Pengabdian")}</td>
                         <td></td>
                         <td>6 Bulan</td>
-                        <td>${peng_bukti}</td>
+                        <td>${formatLink(lap_peng, "Laporan Pengabdian")}</td>
                         <td>100</td>
                         <td>SELESAI</td>
                     </tr>
@@ -346,17 +373,39 @@
 
             tbody.innerHTML = tableHtml;
 
-            // Simpan Riwayat
+            // Simpan Data Ke Spreadsheet
             const formData = new URLSearchParams();
             formData.append('namaDosen', nama);
-            formData.append('matkulCount', checked.length);
-            formData.append('adaPenelitian', pen_judul ? true : false);
-            formData.append('adaPengabdian', peng_judul ? true : false);
-            fetch(SCRIPT_URL, { method: 'POST', body: formData }).catch(e => {});
+            formData.append('semester', smt);
+            formData.append('matkulList', checked.join(', '));
+            formData.append('st_dosen', st_dosen);
+            formData.append('absen_nilai', absen_nilai);
+            formData.append('judul_penelitian', judul_pen);
+            formData.append('st_penelitian', st_pen);
+            formData.append('lap_penelitian', lap_pen);
+            formData.append('judul_pengabdian', judul_peng);
+            formData.append('st_pengabdian', st_peng);
+            formData.append('lap_pengabdian', lap_peng);
+            
+            const btn = document.getElementById("btn-submit");
+            const temp = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
+            btn.disabled = true;
 
-            // Buka Modal
-            document.getElementById('preview-modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(() => {
+                btn.innerHTML = temp;
+                btn.disabled = false;
+                document.getElementById('preview-modal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }).catch(e => {
+                btn.innerHTML = temp;
+                btn.disabled = false;
+                alert("Berhasil dicetak ke PDF, namun gagal merekam ke Google Sheet.");
+                document.getElementById('preview-modal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
         }
 
         function tutupPratinjau() {
@@ -383,7 +432,7 @@
 
             const opt = {
                 margin:       0,
-                filename:     `Laporan_Kinerja_${currentDosenDetail.nama.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+                filename:     `Laporan_BKD_${currentDosenDetail.nama.replace(/[^a-z0-9]/gi, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
                 html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } 
@@ -406,11 +455,11 @@
             riwayatList.slice(0, 10).forEach(item => {
                 let dateStr = new Date(item.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
                 html += `
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
                         <td class="p-4 align-top">
-                            <div class="text-xs font-bold text-slate-500 mb-1">${dateStr}</div>
+                            <div class="text-[10px] font-bold text-slate-400 mb-1">${dateStr}</div>
                             <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
-                            <div class="text-[10px] font-semibold text-emerald-600 mt-1 uppercase bg-emerald-50 inline-block px-2 py-0.5 rounded border border-emerald-200">${item.kegiatanUtama}</div>
+                            <div class="text-xs text-slate-500 mt-1 line-clamp-1" title="${item.kegiatan}">${item.kegiatan}</div>
                         </td>
                     </tr>
                 `;
