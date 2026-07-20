@@ -224,6 +224,7 @@
         let allDosenData = {}; 
         let currentDosenDetail = {};
         let riwayatCache = [];
+        let localFormCache = {}; // Untuk menyimpan data form yang utuh secara lokal
 
         function formatTanggal(isoString) {
             if (!isoString || isoString === '-') return '-';
@@ -307,7 +308,7 @@
         }
 
         function formatLink(url, label = "Buka Tautan") {
-            if (!url) return "-";
+            if (!url || url.trim() === "" || url === "-") return "-";
             return `<a href="${url}" target="_blank" class="link-text">${label}</a>`;
         }
 
@@ -315,18 +316,30 @@
             const tbody = document.getElementById("pdf-table-body");
             let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
 
-            const matkulArr = dataRinci.matkulList && dataRinci.matkulList.trim() !== "" ? dataRinci.matkulList.split(', ') : [];
+            // Helper untuk mengambil value dengan penamaan kunci fleksibel 
+            const getVal = (keys) => {
+                for (let k of keys) {
+                    if (dataRinci[k] !== undefined && dataRinci[k] !== null && dataRinci[k] !== "") return dataRinci[k];
+                }
+                return "";
+            };
+
+            const rawMatkul = getVal(['matkulList', 'Matkul', 'Kegiatan', 'kegiatan']);
+            const matkulArr = rawMatkul && rawMatkul.trim() !== "" ? rawMatkul.split(', ') : [];
             
-            if(matkulArr.length > 0) {
+            const stDosen = getVal(['st_dosen', 'Surat Tugas Dosen', 'ST Dosen']);
+            const absenNilai = getVal(['absen_nilai', 'Absen dan Nilai', 'Absen']);
+
+            if(matkulArr.length > 0 && matkulArr[0] !== "-") {
                 matkulArr.forEach((mk, index) => {
                     tableHtml += `
                         <tr>
                             <td>${index + 1}</td>
                             <td class="text-left">${mk}</td>
-                            <td>${formatLink(dataRinci.st_dosen, "Surat Tugas")}</td>
+                            <td>${formatLink(stDosen, "Surat Tugas")}</td>
                             <td>2</td>
                             <td>6 Bulan</td>
-                            <td>${formatLink(dataRinci.absen_nilai, "Absen & Nilai")}</td>
+                            <td>${formatLink(absenNilai, "Absen & Nilai")}</td>
                             <td>100 &nbsp; 1</td>
                             <td>SELESAI</td>
                         </tr>
@@ -348,30 +361,38 @@
             }
             
             // BIDANG PENELITIAN
+            const judulPen = getVal(['judul_penelitian', 'Judul Penelitian', 'Penelitian']) || '-';
+            const stPen = getVal(['st_penelitian', 'Surat Tugas Penelitian', 'ST Penelitian']);
+            const lapPen = getVal(['lap_penelitian', 'Laporan Penelitian']);
+
             tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
             tableHtml += `
                 <tr>
                     <td>1</td>
-                    <td class="text-left font-bold">${dataRinci.judul_penelitian || '-'}</td>
-                    <td>${formatLink(dataRinci.st_penelitian, "Surat Tugas Penelitian")}</td>
+                    <td class="text-left font-bold">${judulPen}</td>
+                    <td>${formatLink(stPen, "Surat Tugas Penelitian")}</td>
                     <td>3</td>
                     <td>6 Bulan</td>
-                    <td>${formatLink(dataRinci.lap_penelitian, "Laporan Penelitian")}</td>
+                    <td>${formatLink(lapPen, "Laporan Penelitian")}</td>
                     <td>100</td>
                     <td>SELESAI</td>
                 </tr>
             `;
 
             // BIDANG PENGABDIAN
+            const judulPeng = getVal(['judul_pengabdian', 'Judul Pengabdian', 'Pengabdian']) || '-';
+            const stPeng = getVal(['st_pengabdian', 'Surat Tugas Pengabdian', 'ST Pengabdian']);
+            const lapPeng = getVal(['lap_pengabdian', 'Laporan Pengabdian']);
+
             tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
             tableHtml += `
                 <tr>
                     <td>1</td>
-                    <td class="text-left font-bold">${dataRinci.judul_pengabdian || '-'}</td>
-                    <td>${formatLink(dataRinci.st_pengabdian, "Surat Tugas Pengabdian")}</td>
+                    <td class="text-left font-bold">${judulPeng}</td>
+                    <td>${formatLink(stPeng, "Surat Tugas Pengabdian")}</td>
                     <td>1</td>
                     <td>6 Bulan</td>
-                    <td>${formatLink(dataRinci.lap_pengabdian, "Laporan Pengabdian")}</td>
+                    <td>${formatLink(lapPeng, "Laporan Pengabdian")}</td>
                     <td>100</td>
                     <td>SELESAI</td>
                 </tr>
@@ -381,8 +402,14 @@
         }
 
         function bukaPratinjauDariRiwayat(index) {
-            const item = riwayatCache[index];
+            let item = riwayatCache[index];
             if (!item) return;
+
+            // Gabungkan objek riwayat dengan data utuh di cache lokal (jika ada) 
+            // agar data tautan dan form tidak hilang menjadi " - "
+            if (localFormCache[item.namaDosen]) {
+                item = { ...localFormCache[item.namaDosen], ...item };
+            }
 
             const d = allDosenData[item.namaDosen];
             if (!d) {
@@ -444,6 +471,9 @@
                 st_pengabdian: st_peng,
                 lap_pengabdian: lap_peng
             };
+
+            // Menyimpan form utuh di cache memori lokal sehingga tetap utuh kalau riwayat diklik
+            localFormCache[nama] = dataPaket;
 
             generateTableContent(dataPaket);
 
