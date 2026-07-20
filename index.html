@@ -187,9 +187,26 @@
                     
                     <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 15mm 20mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
                         
+                        <!-- KOP SURAT (Dibuat lebih rapat spasi antar barisnya) -->
+                        <div style="text-align: center; line-height: 1.15;">
+                            <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
+                            <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
+                            <!-- SPASI ARAB DIPERBAIKI DENGAN KODE &nbsp; AGAR TIDAK HILANG SAAT DICETAK -->
+                            <div style="font-size: 20px; font-weight: bold; margin: 3px 0;">جامعة&nbsp;الإمام&nbsp;الشافعي</div>
+                            <div style="font-size: 12px; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
+                            <div style="font-size: 12px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+                        </div>
+                        
+                        <!-- GARIS PEMBATAS KOP -->
+                        <div style="margin-top: 10px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
+                        <div style="margin-bottom: 15px; border-bottom: 1px solid black;"></div>
+
+                        <!-- JUDUL LAPORAN -->
+                        <h2 style="font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 25px; text-transform: uppercase;">LAPORAN BEBAN KINERJA DOSEN</h2>
+
                         <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">I. IDENTITAS</div>
                         <div id="pdf-identitas" style="display: grid; grid-template-columns: 220px 15px 1fr; gap: 4px; font-size: 13px; margin-bottom: 20px; line-height: 1.4;">
-                            </div>
+                        </div>
 
                         <table class="pdf-table">
                             <thead>
@@ -209,7 +226,7 @@
                                 </tr>
                             </thead>
                             <tbody id="pdf-table-body">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
 
@@ -222,7 +239,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
         
         let allDosenData = {}; 
-        let allSksData = {}; // Menyimpan data SKS Kurikulum
+        let allSksData = {}; 
         let currentDosenDetail = {};
         let riwayatCache = [];
         let localFormCache = {}; 
