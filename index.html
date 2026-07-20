@@ -324,11 +324,12 @@
                 return "";
             };
 
-            const rawMatkul = getVal(['matkulList', 'Matkul', 'Kegiatan', 'kegiatan']);
+            // Tambahkan variasi penamaan kunci JSON (camelCase/spasi) sesuai kebiasaan Google Apps Script
+            const rawMatkul = getVal(['matkulList', 'Matkul', 'Kegiatan', 'kegiatan', 'Mata Kuliah', 'mataKuliah']);
             const matkulArr = rawMatkul && rawMatkul.trim() !== "" ? rawMatkul.split(', ') : [];
             
-            const stDosen = getVal(['st_dosen', 'Surat Tugas Dosen', 'ST Dosen']);
-            const absenNilai = getVal(['absen_nilai', 'Absen dan Nilai', 'Absen']);
+            const stDosen = getVal(['st_dosen', 'Surat Tugas Dosen', 'ST Dosen', 'suratTugasDosen']);
+            const absenNilai = getVal(['absen_nilai', 'Absen dan Nilai', 'Absen', 'absenDanNilai']);
 
             if(matkulArr.length > 0 && matkulArr[0] !== "-") {
                 matkulArr.forEach((mk, index) => {
@@ -361,9 +362,12 @@
             }
             
             // BIDANG PENELITIAN
-            const judulPen = getVal(['judul_penelitian', 'Judul Penelitian', 'Penelitian']) || '-';
-            const stPen = getVal(['st_penelitian', 'Surat Tugas Penelitian', 'ST Penelitian']);
-            const lapPen = getVal(['lap_penelitian', 'Laporan Penelitian']);
+            const judulPen = getVal(['judul_penelitian', 'Judul Penelitian', 'Penelitian', 'judulPenelitian']) || '-';
+            const stPen = getVal(['st_penelitian', 'Surat Tugas Penelitian', 'ST Penelitian', 'suratTugasPenelitian']);
+            const lapPen = getVal(['lap_penelitian', 'Laporan Penelitian', 'laporanPenelitian']);
+            
+            // Logika pengecekan apakah ada isian penelitian
+            const isPenFilled = (judulPen !== '-' && judulPen.trim() !== '');
 
             tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
             tableHtml += `
@@ -371,18 +375,21 @@
                     <td>1</td>
                     <td class="text-left font-bold">${judulPen}</td>
                     <td>${formatLink(stPen, "Surat Tugas Penelitian")}</td>
-                    <td>3</td>
-                    <td>6 Bulan</td>
+                    <td>${isPenFilled ? '3' : '-'}</td>
+                    <td>${isPenFilled ? '6 Bulan' : '-'}</td>
                     <td>${formatLink(lapPen, "Laporan Penelitian")}</td>
-                    <td>100</td>
-                    <td>SELESAI</td>
+                    <td>${isPenFilled ? '100' : '-'}</td>
+                    <td>${isPenFilled ? 'SELESAI' : '-'}</td>
                 </tr>
             `;
 
             // BIDANG PENGABDIAN
-            const judulPeng = getVal(['judul_pengabdian', 'Judul Pengabdian', 'Pengabdian']) || '-';
-            const stPeng = getVal(['st_pengabdian', 'Surat Tugas Pengabdian', 'ST Pengabdian']);
-            const lapPeng = getVal(['lap_pengabdian', 'Laporan Pengabdian']);
+            const judulPeng = getVal(['judul_pengabdian', 'Judul Pengabdian', 'Pengabdian', 'judulPengabdian']) || '-';
+            const stPeng = getVal(['st_pengabdian', 'Surat Tugas Pengabdian', 'ST Pengabdian', 'suratTugasPengabdian']);
+            const lapPeng = getVal(['lap_pengabdian', 'Laporan Pengabdian', 'laporanPengabdian']);
+            
+            // Logika pengecekan apakah ada isian pengabdian
+            const isPengFilled = (judulPeng !== '-' && judulPeng.trim() !== '');
 
             tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
             tableHtml += `
@@ -390,11 +397,11 @@
                     <td>1</td>
                     <td class="text-left font-bold">${judulPeng}</td>
                     <td>${formatLink(stPeng, "Surat Tugas Pengabdian")}</td>
-                    <td>1</td>
-                    <td>6 Bulan</td>
+                    <td>${isPengFilled ? '1' : '-'}</td>
+                    <td>${isPengFilled ? '6 Bulan' : '-'}</td>
                     <td>${formatLink(lapPeng, "Laporan Pengabdian")}</td>
-                    <td>100</td>
-                    <td>SELESAI</td>
+                    <td>${isPengFilled ? '100' : '-'}</td>
+                    <td>${isPengFilled ? 'SELESAI' : '-'}</td>
                 </tr>
             `;
 
