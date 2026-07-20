@@ -268,36 +268,60 @@
             }).catch(err => alert("Gagal terhubung ke database. Cek konfigurasi Script URL."));
         });
 
-        function loadDosenDetails() {
-            const nama = document.getElementById("dosenDropdown").value;
-            const card = document.getElementById("identitasCard");
-            const container = document.getElementById("identitasContainer");
+        function formatTanggal(isoString) {
+    if (!isoString || isoString === '-') return '-';
+    
+    // Mengecek apakah string mengandung 'T' (format ISO dari Google Sheets)
+    if (typeof isoString === 'string' && isoString.includes('T')) {
+        const datePart = isoString.split('T')[0]; // Mengambil "1993-04-04"
+        const parts = datePart.split('-');
+        
+        if (parts.length === 3) {
+            const tahun = parts[0];
+            const bulanIndex = parseInt(parts[1], 10) - 1;
+            const hari = parseInt(parts[2], 10); // Menghilangkan 0 di depan angka
             
-            if (!nama || !allDosenData[nama]) { 
-                card.classList.add("hidden"); 
-                currentDosenDetail = {};
-                return; 
-            }
-
-            // Tampilkan kartu dan panggil data dari memori browser
-            card.classList.remove("hidden");
-            const d = allDosenData[nama];
-            currentDosenDetail = d;
+            const bulanIndo = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
             
-            // Kode yang telah diubah agar sesuai dengan field dan urutan permintaan Anda
-            const html = `
-                <div>Nama Dosen Beserta Gelar</div><div>:</div><div class="font-bold">${d.nama || '-'}</div>
-                <div>Tanggal Lahir</div><div>:</div><div>${d.tanggalLahir || '-'}</div>
-                <div>NUPTK</div><div>:</div><div>${d.nuptk || '-'}</div>
-                <div>Pendidikan Terakhir</div><div>:</div><div>${d.pendidikanTerakhir || '-'}</div>
-                <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi || '-'}</div>
-                <div>Jabatan/Unit Kerja</div><div>:</div><div>${d.jabatanUnitKerja || '-'}</div>
-                <div>Program Studi</div><div>:</div><div>${d.programStudi || '-'}</div>
-                <div>Jabatan Akademik</div><div>:</div><div>${d.jabatanAkademik || '-'}</div>
-            `;
-            container.innerHTML = html;
-            document.getElementById('pdf-identitas').innerHTML = html;
+            return `${hari} ${bulanIndo[bulanIndex]} ${tahun}`;
         }
+    }
+    
+    // Fallback jika formatnya bukan ISO string
+    return isoString;
+}
+        function loadDosenDetails() {
+    const nama = document.getElementById("dosenDropdown").value;
+    const card = document.getElementById("identitasCard");
+    const container = document.getElementById("identitasContainer");
+    
+    if (!nama || !allDosenData[nama]) { 
+        card.classList.add("hidden"); 
+        currentDosenDetail = {};
+        return; 
+    }
+
+    card.classList.remove("hidden");
+    const d = allDosenData[nama];
+    currentDosenDetail = d;
+    
+    // Terapkan fungsi formatTanggal di baris Tanggal Lahir
+    const html = `
+        <div>Nama Dosen Beserta Gelar</div><div>:</div><div class="font-bold">${d.nama || '-'}</div>
+        <div>Tanggal Lahir</div><div>:</div><div>${formatTanggal(d.tanggalLahir)}</div>
+        <div>NUPTK</div><div>:</div><div>${d.nuptk || '-'}</div>
+        <div>Pendidikan Terakhir</div><div>:</div><div>${d.pendidikanTerakhir || '-'}</div>
+        <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi || '-'}</div>
+        <div>Jabatan/Unit Kerja</div><div>:</div><div>${d.jabatanUnitKerja || '-'}</div>
+        <div>Program Studi</div><div>:</div><div>${d.programStudi || '-'}</div>
+        <div>Jabatan Akademik</div><div>:</div><div>${d.jabatanAkademik || '-'}</div>
+    `;
+    container.innerHTML = html;
+    document.getElementById('pdf-identitas').innerHTML = html;
+}
 
         // Fungsi Helper Link
         function formatLink(url, label = "Buka Tautan") {
