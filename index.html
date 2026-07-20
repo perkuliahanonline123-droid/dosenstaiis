@@ -16,9 +16,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
-                    boxShadow: {
-                        'timbul': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
-                    }
+                    boxShadow: { 'timbul': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)' }
                 }
             }
         }
@@ -33,11 +31,13 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .identitas-grid { display: grid; grid-template-columns: 140px 10px 1fr; gap: 4px; font-size: 13px; line-height: 1.4; }
         
-        /* Tabel PDF Styling */
-        .pdf-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11px; margin-top: 15px; }
-        .pdf-table th, .pdf-table td { border: 1px solid black; padding: 4px 6px; text-align: center; }
+        /* CSS KHUSUS TABEL PDF */
+        .pdf-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11.5px; margin-top: 10px; }
+        .pdf-table th, .pdf-table td { border: 1.5px solid black; padding: 4px 6px; text-align: center; vertical-align: middle;}
         .pdf-table th { font-weight: bold; }
         .pdf-table .text-left { text-align: left; }
+        .pdf-table .font-bold { font-weight: bold; }
+        .pdf-table .bg-gray { background-color: #f9fafb; font-weight: bold; text-align: left; padding-left: 10px;}
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
@@ -46,57 +46,98 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
         <div class="relative z-10 flex flex-col items-start text-left w-full mx-auto">
             <span class="text-[10px] md:text-xs font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 inline-block">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
-            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-white">Laporan Beban Kinerja Dosen</h1>
-            <p class="text-emerald-100 text-sm md:text-base mt-2 md:mt-3 max-w-2xl font-normal">Pilih nama dosen dan centang mata kuliah untuk menghasilkan draf laporan BKD secara instan.</p>
+            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-white">Laporan Kinerja Dosen Terpadu</h1>
+            <p class="text-emerald-100 text-sm md:text-base mt-2 md:mt-3 max-w-2xl font-normal">Lengkapi form Pendidikan, Penelitian, dan Pengabdian untuk menyusun dokumen BKD.</p>
         </div>
     </header>
 
     <main class="w-full mx-auto px-6 md:px-10 mt-8 relative z-20 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- KIRI: FORM & IDENTITAS -->
+        <!-- KIRI: FORMULIR -->
         <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full animate-slide-up">
             
+            <!-- 1. IDENTITAS -->
             <div class="mb-6">
-                <label for="dosenDropdown" class="block mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">Pilih Nama Dosen <span class="text-emerald-600">*</span></label>
+                <label class="block mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">I. Pilih Dosen <span class="text-emerald-600">*</span></label>
                 <div class="relative">
-                    <select id="dosenDropdown" onchange="loadDosenDetails()" class="bg-white border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-3.5 outline-none transition-all shadow-sm appearance-none cursor-pointer">
+                    <select id="dosenDropdown" onchange="loadDosenDetails()" class="bg-white border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3.5 outline-none transition-all shadow-sm appearance-none cursor-pointer">
                         <option value="">-- Menghubungkan ke Database... --</option>
                     </select>
                     <i class="fas fa-chevron-down absolute right-4 top-4 text-slate-400 pointer-events-none"></i>
                 </div>
             </div>
 
-            <!-- Kartu Identitas (Ditampilkan saat Dosen dipilih) -->
+            <!-- Kartu Sub Identitas -->
             <div id="identitasCard" class="hidden bg-slate-50 border border-slate-200 rounded-lg p-5 mb-8 shadow-inner">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-4 border-b border-slate-200 pb-2"><i class="fas fa-id-card mr-2"></i> Sub Identitas Dosen</h3>
-                <div class="identitas-grid text-slate-700" id="identitasContainer">
-                    <!-- Diisi JS -->
-                </div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-4 border-b border-slate-200 pb-2"><i class="fas fa-id-card mr-2"></i> Sub Identitas</h3>
+                <div class="identitas-grid text-slate-700" id="identitasContainer"></div>
             </div>
 
-            <!-- Pilihan Mata Kuliah -->
-            <div>
-                <label class="block mb-3 text-xs font-bold uppercase tracking-wider text-slate-600">Mata Kuliah Yang Diampu <span class="text-emerald-600">*</span></label>
-                <div class="bg-white border border-slate-200 rounded-lg p-5 max-h-80 overflow-y-auto custom-scrollbar shadow-inner">
+            <!-- 2. PENDIDIKAN (MATA KULIAH) -->
+            <div class="mb-8">
+                <label class="block mb-3 text-xs font-bold uppercase tracking-wider text-slate-600">II. Bidang Pendidikan (Pilih Mata Kuliah) <span class="text-emerald-600">*</span></label>
+                <div class="bg-white border border-slate-200 rounded-lg p-5 max-h-60 overflow-y-auto custom-scrollbar shadow-inner">
                     <div id="matkulCheckboxList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <p class="text-xs text-slate-500 animate-pulse col-span-full">Menghubungkan ke database...</p>
                     </div>
                 </div>
             </div>
 
-            <div class="pt-6 mt-6 border-t border-slate-100 flex justify-end">
-                <button type="button" id="btn-submit" onclick="siapkanLaporan()" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-200 font-bold rounded-lg text-xs uppercase tracking-wider px-6 py-3.5 transition-all flex items-center gap-2 shadow-md disabled:opacity-50">
+            <!-- 3. PENELITIAN -->
+            <div class="mb-8 bg-slate-50 border border-slate-200 rounded-lg p-5 shadow-inner">
+                <label class="block mb-4 text-xs font-bold uppercase tracking-wider text-emerald-700 border-b border-slate-200 pb-2">III. Bidang Penelitian (Opsional)</label>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block mb-1 text-[11px] font-bold text-slate-500">Judul Penelitian</label>
+                        <input type="text" id="penelitian_judul" class="w-full p-2.5 text-sm border border-slate-300 rounded-md focus:ring-emerald-500 outline-none" placeholder="Contoh: Penelitian Dasar Pengembangan Prodi">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Penugasan (SK)</label>
+                            <input type="text" id="penelitian_sk" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: SK Rektor No 060 Tahun 2026">
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Kinerja</label>
+                            <input type="text" id="penelitian_bukti" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: Laporan Penelitian">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. PENGABDIAN -->
+            <div class="mb-6 bg-slate-50 border border-slate-200 rounded-lg p-5 shadow-inner">
+                <label class="block mb-4 text-xs font-bold uppercase tracking-wider text-emerald-700 border-b border-slate-200 pb-2">IV. Bidang Pengabdian (Opsional)</label>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block mb-1 text-[11px] font-bold text-slate-500">Judul Kegiatan Pengabdian</label>
+                        <input type="text" id="pengabdian_judul" class="w-full p-2.5 text-sm border border-slate-300 rounded-md focus:ring-emerald-500 outline-none" placeholder="Contoh: Penyuluhan Hukum Keluarga di Desa">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Penugasan (SK)</label>
+                            <input type="text" id="pengabdian_sk" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: Surat Tugas Dekan">
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-[11px] font-bold text-slate-500">Bukti Kinerja</label>
+                            <input type="text" id="pengabdian_bukti" class="w-full p-2.5 text-sm border border-slate-300 rounded-md outline-none" placeholder="Contoh: Laporan Kegiatan">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100 flex justify-end">
+                <button type="button" id="btn-submit" onclick="siapkanLaporan()" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-200 font-bold rounded-lg text-xs uppercase tracking-wider px-6 py-3.5 transition-all flex items-center gap-2 shadow-md">
                     <i class="fas fa-file-signature"></i> Buat Laporan & Pratinjau
                 </button>
             </div>
         </div>
 
         <!-- KANAN: RIWAYAT -->
-        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden animate-slide-up sticky top-8" style="animation-delay: 0.1s;">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
+        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden animate-slide-up sticky top-8">
+            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200">
                 <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log Laporan Terakhir</h2>
             </div>
-            <div id="historyTableContainer" class="overflow-y-auto max-h-[500px] custom-scrollbar">
+            <div id="historyTableContainer" class="overflow-y-auto max-h-[600px] custom-scrollbar">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
                     <tbody id="historyBody" class="divide-y divide-slate-100 bg-white">
                         <tr><td class="p-5 text-center text-xs text-slate-500">Memuat riwayat...</td></tr>
@@ -106,32 +147,32 @@
         </div>
     </main>
 
-    <!-- MODAL PRATINJAU PDF -->
+    <!-- MODAL PRATINJAU PDF (UKURAN LEBIH LEBAR UNTUK LANDSCAPE) -->
     <div id="preview-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm overflow-y-auto flex items-start justify-center pt-8 pb-10 px-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-[900px] overflow-hidden flex flex-col animate-slide-up mt-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-[1000px] overflow-hidden flex flex-col animate-slide-up mt-2">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-2 text-slate-700">
                     <i class="fas fa-search text-emerald-600"></i>
                     <h3 class="font-bold text-sm uppercase tracking-wider">Pratinjau Laporan Kinerja</h3>
                 </div>
                 <div class="flex gap-3">
-                    <button type="button" onclick="tutupPratinjau()" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">Tutup</button>
-                    <button type="button" id="btn-cetak" onclick="cetakPDF()" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2">
+                    <button type="button" onclick="tutupPratinjau()" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">Tutup</button>
+                    <button type="button" id="btn-cetak" onclick="cetakPDF()" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
                         <i class="fas fa-file-pdf"></i> Cetak PDF
                     </button>
                 </div>
             </div>
             
-            <div class="p-8 bg-slate-200 flex justify-center overflow-x-auto custom-scrollbar">
+            <div class="p-6 bg-slate-200 flex justify-center overflow-x-auto custom-scrollbar">
                 <div class="shadow-xl flex-shrink-0 bg-white">
                     
                     <!-- KERTAS A4 LANDSCAPE -->
-                    <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 15mm 20mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
+                    <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 12mm 15mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
                         
                         <!-- I. IDENTITAS -->
-                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">I. IDENTITAS</div>
-                        <div id="pdf-identitas" style="display: grid; grid-template-columns: 180px 15px 1fr; gap: 3px; font-size: 11px; margin-bottom: 20px;">
-                            <!-- Diisi JS -->
+                        <div style="font-weight: bold; font-size: 13px; margin-bottom: 6px;">I. IDENTITAS</div>
+                        <div id="pdf-identitas" style="display: grid; grid-template-columns: 180px 15px 1fr; gap: 3px; font-size: 12px; margin-bottom: 15px; line-height: 1.3;">
+                            <!-- Diisi Otomatis -->
                         </div>
 
                         <!-- TABEL KINERJA -->
@@ -139,21 +180,21 @@
                             <thead>
                                 <tr>
                                     <th rowspan="2" style="width: 30px;">No</th>
-                                    <th rowspan="2" style="width: 250px;">Kegiatan</th>
+                                    <th rowspan="2" style="width: 300px;">Kegiatan</th>
                                     <th colspan="2">Beban Kerja</th>
-                                    <th rowspan="2" style="width: 120px;">Masa Pelaksanaan Tugas</th>
+                                    <th rowspan="2" style="width: 110px;">Masa Pelaksanaan<br>Tugas</th>
                                     <th colspan="2">Kinerja</th>
-                                    <th rowspan="2" style="width: 150px;">Penilaian/Rekomendasi Asesor</th>
+                                    <th rowspan="2" style="width: 140px;">Penilaian/Rekomendasi Asesor</th>
                                 </tr>
                                 <tr>
-                                    <th style="width: 120px;">Bukti Penugasan</th>
+                                    <th style="width: 140px;">Bukti Penugasan</th>
                                     <th style="width: 40px;">SKS</th>
-                                    <th style="width: 120px;">Bukti Kinerja</th>
-                                    <th style="width: 80px;">Capaian<br>% SKS</th>
+                                    <th style="width: 140px;">Bukti Kinerja</th>
+                                    <th style="width: 70px;">Capaian<br>% SKS</th>
                                 </tr>
                             </thead>
                             <tbody id="pdf-table-body">
-                                <!-- Diisi JS -->
+                                <!-- Diisi JavaScript -->
                             </tbody>
                         </table>
                     </div>
@@ -165,29 +206,21 @@
 
     <!-- SCRIPT LOGIC -->
     <script>
-        // GANTI LINK DI BAWAH DENGAN URL WEB APP BARU ANDA DARI LANGKAH 1
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxe591Zxhp3duBbyTmlt8gMIV7dpNh8_kb8WL2v7Ifl3wvQH64Fpvpuyv1e04fZLfvSIg/exec';
+        // MASUKKAN LINK WEB APP BARU DI SINI
+        const SCRIPT_URL = 'LINK_APPS_SCRIPT_ANDA_DISINI';
         
         let currentDosenDetail = {};
 
         document.addEventListener("DOMContentLoaded", () => {
-            inisialisasiAwal();
-        });
-
-        function inisialisasiAwal() {
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
-                // Render Dropdown
+                // Dropdown Dosen
                 const dropdown = document.getElementById("dosenDropdown");
                 dropdown.innerHTML = '<option value="">-- Pilih Nama Dosen --</option>';
-                if(data.dosen) {
-                    data.dosen.forEach(nama => {
-                        dropdown.innerHTML += `<option value="${nama}">${nama}</option>`;
-                    });
-                }
+                if(data.dosen) data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
                 
-                // Render Mata Kuliah
+                // Daftar Mata Kuliah
                 const mkContainer = document.getElementById("matkulCheckboxList");
                 mkContainer.innerHTML = '';
                 if(data.matkul) {
@@ -203,19 +236,15 @@
 
                 // Render Riwayat
                 renderRiwayat(data.riwayat || []);
-            })
-            .catch(err => alert("Gagal terhubung ke database. Muat ulang halaman."));
-        }
+            }).catch(err => alert("Gagal terhubung ke database."));
+        });
 
         function loadDosenDetails() {
             const nama = document.getElementById("dosenDropdown").value;
             const card = document.getElementById("identitasCard");
             const container = document.getElementById("identitasContainer");
             
-            if (!nama) {
-                card.classList.add("hidden");
-                return;
-            }
+            if (!nama) { card.classList.add("hidden"); return; }
 
             container.innerHTML = `<div class="col-span-3 text-emerald-600 animate-pulse"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil biodata...</div>`;
             card.classList.remove("hidden");
@@ -225,7 +254,6 @@
             .then(res => {
                 const d = res.data;
                 currentDosenDetail = d;
-                
                 const html = `
                     <div>Nama</div><div>:</div><div class="font-bold">${d.nama}</div>
                     <div>No. Sertifikat</div><div>:</div><div>${d.noSertifikat}</div>
@@ -243,30 +271,30 @@
                     <div>No. HP</div><div>:</div><div>${d.noHp}</div>
                 `;
                 container.innerHTML = html;
-                
-                // Siapkan juga identitas untuk PDF
                 document.getElementById('pdf-identitas').innerHTML = html;
             });
         }
 
         function siapkanLaporan() {
             const nama = document.getElementById("dosenDropdown").value;
-            if(!nama || Object.keys(currentDosenDetail).length === 0) {
-                alert("Pilih dosen dan tunggu hingga biodata muncul."); return;
-            }
+            if(!nama || !currentDosenDetail.nama) { alert("Pilih dosen terlebih dahulu."); return; }
 
             const checked = Array.from(document.querySelectorAll('input[name="matakuliah"]:checked')).map(cb => cb.value);
-            if(checked.length === 0) {
-                alert("Centang minimal satu mata kuliah yang diampu."); return;
-            }
+            if(checked.length === 0) { alert("Centang minimal satu mata kuliah."); return; }
+
+            // Ambil Data Penelitian & Pengabdian
+            const pen_judul = document.getElementById("penelitian_judul").value.trim();
+            const pen_sk = document.getElementById("penelitian_sk").value.trim();
+            const pen_bukti = document.getElementById("penelitian_bukti").value.trim();
+
+            const peng_judul = document.getElementById("pengabdian_judul").value.trim();
+            const peng_sk = document.getElementById("pengabdian_sk").value.trim();
+            const peng_bukti = document.getElementById("pengabdian_bukti").value.trim();
 
             const tbody = document.getElementById("pdf-table-body");
-            let tableHtml = `
-                <tr style="background-color: #f1f5f9; font-weight:bold;">
-                    <td colspan="8" class="text-left">II. BIDANG PENDIDIKAN</td>
-                </tr>
-            `;
+            let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
 
+            // Render Baris Mata Kuliah
             checked.forEach((mk, index) => {
                 tableHtml += `
                     <tr>
@@ -276,37 +304,55 @@
                         <td>2</td>
                         <td>6 Bulan</td>
                         <td>Absen dan Nilai</td>
-                        <td>100 &nbsp; 1</td>
+                        <td>100 &nbsp;&nbsp;&nbsp; 1</td>
                         <td>SELESAI</td>
                     </tr>
                 `;
             });
             
-            // Tambahan Bidang Penelitian (Statis sbg pelengkap)
-            tableHtml += `
-                <tr style="background-color: #f1f5f9; font-weight:bold;">
-                    <td colspan="8" class="text-left">III. BIDANG PENELITIAN</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td class="text-left font-bold">Penelitian Dasar Pengembangan Prodi</td>
-                    <td>SK Rektor IAIN Kerinci<br>No 060 Tahun 2026</td>
-                    <td></td>
-                    <td>6 Bulan</td>
-                    <td>Laporan Penelitian</td>
-                    <td>100</td>
-                    <td>SELESAI</td>
-                </tr>
-            `;
+            // Render Baris Penelitian
+            if(pen_judul) {
+                tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
+                tableHtml += `
+                    <tr>
+                        <td>1</td>
+                        <td class="text-left font-bold">${pen_judul}</td>
+                        <td>${pen_sk.replace(/\n/g, '<br>')}</td>
+                        <td></td>
+                        <td>6 Bulan</td>
+                        <td>${pen_bukti}</td>
+                        <td>100</td>
+                        <td>SELESAI</td>
+                    </tr>
+                `;
+            }
+
+            // Render Baris Pengabdian
+            if(peng_judul) {
+                tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
+                tableHtml += `
+                    <tr>
+                        <td>1</td>
+                        <td class="text-left font-bold">${peng_judul}</td>
+                        <td>${peng_sk.replace(/\n/g, '<br>')}</td>
+                        <td></td>
+                        <td>6 Bulan</td>
+                        <td>${peng_bukti}</td>
+                        <td>100</td>
+                        <td>SELESAI</td>
+                    </tr>
+                `;
+            }
 
             tbody.innerHTML = tableHtml;
 
-            // Simpan Riwayat ke Server secara background
+            // Simpan Riwayat
             const formData = new URLSearchParams();
             formData.append('namaDosen', nama);
             formData.append('matkulCount', checked.length);
-            formData.append('matkulList', checked.join(', '));
-            fetch(SCRIPT_URL, { method: 'POST', body: formData }).catch(e => console.log(e));
+            formData.append('adaPenelitian', pen_judul ? true : false);
+            formData.append('adaPengabdian', peng_judul ? true : false);
+            fetch(SCRIPT_URL, { method: 'POST', body: formData }).catch(e => {});
 
             // Buka Modal
             document.getElementById('preview-modal').classList.remove('hidden');
@@ -325,12 +371,11 @@
 
             const element = document.getElementById('pdf-template');
             const clone = element.cloneNode(true);
-            
             const wrapper = document.createElement('div');
             wrapper.style.position = 'absolute';
             wrapper.style.top = '0';
             wrapper.style.left = '0';
-            wrapper.style.width = '297mm'; // Landscape
+            wrapper.style.width = '297mm'; 
             wrapper.style.zIndex = '1';
             
             wrapper.appendChild(clone);
@@ -338,10 +383,10 @@
 
             const opt = {
                 margin:       0,
-                filename:     `Laporan_BKD_${currentDosenDetail.nama.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+                filename:     `Laporan_Kinerja_${currentDosenDetail.nama.replace(/[^a-z0-9]/gi, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
                 html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // PDF Lanscape seperti gambar 1
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } 
             };
 
             html2pdf().set(opt).from(clone).save().then(() => {
@@ -357,16 +402,15 @@
                 tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada riwayat cetak.</td></tr>';
                 return;
             }
-
             let html = '';
             riwayatList.slice(0, 10).forEach(item => {
-                let dateStr = new Date(item.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+                let dateStr = new Date(item.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
                 html += `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-4 align-top">
                             <div class="text-xs font-bold text-slate-500 mb-1">${dateStr}</div>
                             <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
-                            <div class="text-[10px] font-semibold text-emerald-600 mt-1 uppercase bg-emerald-50 inline-block px-2 py-0.5 rounded border border-emerald-200">${item.matkulCount} Matkul Dipilih</div>
+                            <div class="text-[10px] font-semibold text-emerald-600 mt-1 uppercase bg-emerald-50 inline-block px-2 py-0.5 rounded border border-emerald-200">${item.kegiatanUtama}</div>
                         </td>
                     </tr>
                 `;
