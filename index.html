@@ -29,14 +29,19 @@
         
         .identitas-grid { display: grid; grid-template-columns: 180px 10px 1fr; gap: 4px; font-size: 13px; line-height: 1.4; }
         
-        /* CSS TABEL PDF */
-        .pdf-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11.5px; margin-top: 10px; }
-        .pdf-table th, .pdf-table td { border: 1.5px solid black; padding: 4px 6px; text-align: center; vertical-align: middle;}
-        .pdf-table th { font-weight: bold; }
+        /* CSS TABEL PDF DIPERBAIKI */
+        .pdf-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11.5px; margin-top: 15px; }
+        .pdf-table th, .pdf-table td { border: 1px solid black; padding: 6px 8px; text-align: center; vertical-align: middle;}
+        .pdf-table th { font-weight: bold; background-color: #ffffff; }
         .pdf-table .text-left { text-align: left; }
         .pdf-table .font-bold { font-weight: bold; }
         .pdf-table .bg-gray { background-color: #f9fafb; font-weight: bold; text-align: left; padding-left: 10px;}
-        .link-text { color: #2563eb; text-decoration: underline; font-size: 10px; word-break: break-all;}
+        .link-text { color: #2563eb; text-decoration: underline; font-size: 10.5px; word-break: break-all;}
+        
+        /* Skala Preview Kertas A4 */
+        #pdf-template-wrapper { transform-origin: top center; }
+        @media (max-width: 1024px) { #pdf-template-wrapper { transform: scale(0.8); } }
+        @media (max-width: 768px) { #pdf-template-wrapper { transform: scale(0.5); } }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
@@ -171,45 +176,46 @@
 
     <!-- MODAL PRATINJAU PDF (LANDSCAPE) -->
     <div id="preview-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm overflow-y-auto flex items-start justify-center pt-8 pb-10 px-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-[1000px] overflow-hidden flex flex-col mt-2">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-[1100px] overflow-hidden flex flex-col mt-2">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-2 text-slate-700">
                     <i class="fas fa-search text-emerald-600"></i>
                     <h3 class="font-bold text-sm uppercase tracking-wider">Pratinjau Laporan Kinerja</h3>
                 </div>
                 <div class="flex gap-3">
-                    <button type="button" onclick="tutupPratinjau()" class="px-4 py-2 text-xs font-semibold uppercase text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">Tutup</button>
-                    <button type="button" id="btn-cetak" onclick="cetakPDF()" class="px-4 py-2 text-xs font-bold uppercase text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
+                    <button type="button" onclick="tutupPratinjau()" class="px-4 py-2 text-xs font-semibold uppercase text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition">Tutup</button>
+                    <button type="button" id="btn-cetak" onclick="cetakPDF()" class="px-4 py-2 text-xs font-bold uppercase text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition flex items-center gap-2">
                         <i class="fas fa-file-pdf"></i> Cetak PDF
                     </button>
                 </div>
             </div>
             
-            <div class="p-6 bg-slate-200 flex justify-center overflow-x-auto custom-scrollbar">
-                <div class="shadow-xl flex-shrink-0 bg-white">
+            <div class="p-6 bg-slate-300 flex justify-center overflow-x-auto custom-scrollbar">
+                <div id="pdf-template-wrapper" class="shadow-2xl bg-white">
                     
-                    <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 12mm 15mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
+                    <!-- Ukuran pasti A4 Landscape (297mm x 210mm) -->
+                    <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 15mm 20mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
                         
-                        <div style="font-weight: bold; font-size: 13px; margin-bottom: 6px;">I. IDENTITAS</div>
-                        <div id="pdf-identitas" style="display: grid; grid-template-columns: 200px 15px 1fr; gap: 3px; font-size: 12px; margin-bottom: 15px; line-height: 1.3;">
+                        <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">I. IDENTITAS</div>
+                        <div id="pdf-identitas" style="display: grid; grid-template-columns: 220px 15px 1fr; gap: 4px; font-size: 13px; margin-bottom: 20px; line-height: 1.4;">
                             <!-- Diisi Otomatis -->
                         </div>
 
                         <table class="pdf-table">
                             <thead>
                                 <tr>
-                                    <th rowspan="2" style="width: 30px;">No</th>
-                                    <th rowspan="2" style="width: 280px;">Kegiatan</th>
+                                    <th rowspan="2" style="width: 4%;">No</th>
+                                    <th rowspan="2" style="width: 28%;">Kegiatan</th>
                                     <th colspan="2">Beban Kerja</th>
-                                    <th rowspan="2" style="width: 110px;">Masa Pelaksanaan<br>Tugas</th>
+                                    <th rowspan="2" style="width: 12%;">Masa Pelaksanaan<br>Tugas</th>
                                     <th colspan="2">Kinerja</th>
-                                    <th rowspan="2" style="width: 120px;">Penilaian/Rekomendasi<br>Asesor</th>
+                                    <th rowspan="2" style="width: 14%;">Penilaian/Rekomendasi<br>Asesor</th>
                                 </tr>
                                 <tr>
-                                    <th style="width: 140px;">Bukti Penugasan</th>
-                                    <th style="width: 40px;">SKS</th>
-                                    <th style="width: 140px;">Bukti Kinerja</th>
-                                    <th style="width: 70px;">Capaian<br>% SKS</th>
+                                    <th style="width: 15%;">Bukti Penugasan</th>
+                                    <th style="width: 5%;">SKS</th>
+                                    <th style="width: 15%;">Bukti Kinerja</th>
+                                    <th style="width: 7%;">Capaian<br>% SKS</th>
                                 </tr>
                             </thead>
                             <tbody id="pdf-table-body">
@@ -227,8 +233,27 @@
         // MASUKKAN LINK WEB APP BARU DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
         
-        let allDosenData = {}; // Menyimpan data di memori browser
+        let allDosenData = {}; 
         let currentDosenDetail = {};
+
+        // Fungsi Memperbaiki Zona Waktu Tanggal
+        function formatTanggal(isoString) {
+            if (!isoString || isoString === '-') return '-';
+            try {
+                const date = new Date(isoString);
+                // Validasi apakah tanggal valid
+                if (isNaN(date.getTime())) return isoString; 
+                
+                const hari = date.getDate();
+                const bulanIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                const bulan = bulanIndo[date.getMonth()];
+                const tahun = date.getFullYear();
+                
+                return `${hari} ${bulan} ${tahun}`;
+            } catch(e) {
+                return isoString; // Kembalikan string asli jika gagal
+            }
+        }
 
         document.addEventListener("DOMContentLoaded", () => {
             fetch(SCRIPT_URL)
@@ -239,17 +264,14 @@
                     return;
                 }
 
-                // 1. Simpan detail dosen di memori agar loading instan
                 allDosenData = data.detailDosen || {};
 
-                // 2. Isi Dropdown Dosen
                 const dropdown = document.getElementById("dosenDropdown");
                 dropdown.innerHTML = '<option value="">-- Pilih Nama Dosen --</option>';
                 if(data.dosen) {
                     data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
                 }
                 
-                // 3. Isi Checkbox Matkul
                 const mkContainer = document.getElementById("matkulCheckboxList");
                 mkContainer.innerHTML = '';
                 if(data.matkul) {
@@ -263,67 +285,39 @@
                     });
                 }
                 
-                // 4. Render Riwayat
                 renderRiwayat(data.riwayat || []);
             }).catch(err => alert("Gagal terhubung ke database. Cek konfigurasi Script URL."));
         });
 
-        function formatTanggal(isoString) {
-    if (!isoString || isoString === '-') return '-';
-    
-    // Mengecek apakah string mengandung 'T' (format ISO dari Google Sheets)
-    if (typeof isoString === 'string' && isoString.includes('T')) {
-        const datePart = isoString.split('T')[0]; // Mengambil "1993-04-04"
-        const parts = datePart.split('-');
-        
-        if (parts.length === 3) {
-            const tahun = parts[0];
-            const bulanIndex = parseInt(parts[1], 10) - 1;
-            const hari = parseInt(parts[2], 10); // Menghilangkan 0 di depan angka
-            
-            const bulanIndo = [
-                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-            ];
-            
-            return `${hari} ${bulanIndo[bulanIndex]} ${tahun}`;
-        }
-    }
-    
-    // Fallback jika formatnya bukan ISO string
-    return isoString;
-}
         function loadDosenDetails() {
-    const nama = document.getElementById("dosenDropdown").value;
-    const card = document.getElementById("identitasCard");
-    const container = document.getElementById("identitasContainer");
-    
-    if (!nama || !allDosenData[nama]) { 
-        card.classList.add("hidden"); 
-        currentDosenDetail = {};
-        return; 
-    }
+            const nama = document.getElementById("dosenDropdown").value;
+            const card = document.getElementById("identitasCard");
+            const container = document.getElementById("identitasContainer");
+            
+            if (!nama || !allDosenData[nama]) { 
+                card.classList.add("hidden"); 
+                currentDosenDetail = {};
+                return; 
+            }
 
-    card.classList.remove("hidden");
-    const d = allDosenData[nama];
-    currentDosenDetail = d;
-    
-    // Terapkan fungsi formatTanggal di baris Tanggal Lahir
-    const html = `
-        <div>Nama Dosen Beserta Gelar</div><div>:</div><div class="font-bold">${d.nama || '-'}</div>
-        <div>Tanggal Lahir</div><div>:</div><div>${formatTanggal(d.tanggalLahir)}</div>
-        <div>NUPTK</div><div>:</div><div>${d.nuptk || '-'}</div>
-        <div>Pendidikan Terakhir</div><div>:</div><div>${d.pendidikanTerakhir || '-'}</div>
-        <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi || '-'}</div>
-        <div>Jabatan/Unit Kerja</div><div>:</div><div>${d.jabatanUnitKerja || '-'}</div>
-        <div>Program Studi</div><div>:</div><div>${d.programStudi || '-'}</div>
-        <div>Jabatan Akademik</div><div>:</div><div>${d.jabatanAkademik || '-'}</div>
-    `;
-    container.innerHTML = html;
-    document.getElementById('pdf-identitas').innerHTML = html;
-}
+            card.classList.remove("hidden");
+            const d = allDosenData[nama];
+            currentDosenDetail = d;
+            
+            const html = `
+                <div>Nama Dosen Beserta Gelar</div><div>:</div><div class="font-bold">${d.nama || '-'}</div>
+                <div>Tanggal Lahir</div><div>:</div><div>${formatTanggal(d.tanggalLahir)}</div>
+                <div>NUPTK</div><div>:</div><div>${d.nuptk || '-'}</div>
+                <div>Pendidikan Terakhir</div><div>:</div><div>${d.pendidikanTerakhir || '-'}</div>
+                <div>Perguruan Tinggi</div><div>:</div><div>${d.perguruanTinggi || '-'}</div>
+                <div>Jabatan/Unit Kerja</div><div>:</div><div>${d.jabatanUnitKerja || '-'}</div>
+                <div>Program Studi</div><div>:</div><div>${d.programStudi || '-'}</div>
+                <div>Jabatan Akademik</div><div>:</div><div>${d.jabatanAkademik || '-'}</div>
+            `;
+            container.innerHTML = html;
+            document.getElementById('pdf-identitas').innerHTML = html;
+        }
 
-        // Fungsi Helper Link
         function formatLink(url, label = "Buka Tautan") {
             if (!url) return "-";
             return `<a href="${url}" target="_blank" class="link-text">${label}</a>`;
@@ -355,7 +349,7 @@
             const tbody = document.getElementById("pdf-table-body");
             let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
 
-            // Row Pendidikan
+            // Row Pendidikan (Menghilangkan angka 1 yang nyasar di Capaian)
             checked.forEach((mk, index) => {
                 tableHtml += `
                     <tr>
@@ -365,13 +359,13 @@
                         <td>2</td>
                         <td>6 Bulan</td>
                         <td>${formatLink(absen_nilai, "Absen & Nilai")}</td>
-                        <td>100 &nbsp;&nbsp; 1</td>
+                        <td>100</td>
                         <td>SELESAI</td>
                     </tr>
                 `;
             });
             
-            // Row Penelitian
+            // Row Penelitian (SKS Diisi 3)
             if(judul_pen) {
                 tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
                 tableHtml += `
@@ -379,7 +373,7 @@
                         <td>1</td>
                         <td class="text-left font-bold">${judul_pen}</td>
                         <td>${formatLink(st_pen, "Surat Tugas Penelitian")}</td>
-                        <td></td>
+                        <td>3</td>
                         <td>6 Bulan</td>
                         <td>${formatLink(lap_pen, "Laporan Penelitian")}</td>
                         <td>100</td>
@@ -388,7 +382,7 @@
                 `;
             }
 
-            // Row Pengabdian
+            // Row Pengabdian (SKS Diisi 3)
             if(judul_peng) {
                 tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
                 tableHtml += `
@@ -396,7 +390,7 @@
                         <td>1</td>
                         <td class="text-left font-bold">${judul_peng}</td>
                         <td>${formatLink(st_peng, "Surat Tugas Pengabdian")}</td>
-                        <td></td>
+                        <td>3</td>
                         <td>6 Bulan</td>
                         <td>${formatLink(lap_peng, "Laporan Pengabdian")}</td>
                         <td>100</td>
@@ -459,7 +453,7 @@
             wrapper.style.top = '0';
             wrapper.style.left = '0';
             wrapper.style.width = '297mm'; 
-            wrapper.style.zIndex = '1';
+            wrapper.style.zIndex = '-999'; // Disembunyikan di background
             
             wrapper.appendChild(clone);
             document.body.appendChild(wrapper);
