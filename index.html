@@ -56,10 +56,8 @@
 
     <main class="w-full mx-auto px-6 md:px-10 mt-8 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- BAGIAN KIRI: FORMULIR UTAMA -->
         <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full">
             
-            <!-- I. IDENTITAS DOSEN -->
             <div class="mb-8 border-b border-slate-200 pb-8">
                 <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-user-tie mr-2"></i>I. Identitas Dosen</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -79,14 +77,12 @@
                     </div>
                 </div>
 
-                <!-- Kartu Sub Identitas Muncul Disini -->
                 <div id="identitasCard" class="hidden mt-5 bg-slate-50 border border-slate-200 rounded-lg p-5 shadow-inner">
                     <h3 class="text-xs font-bold uppercase text-emerald-700 mb-4 border-b border-slate-200 pb-2">Sub Identitas</h3>
                     <div class="identitas-grid text-slate-700" id="identitasContainer"></div>
                 </div>
             </div>
 
-            <!-- II. PENDIDIKAN (PENGAJARAN) -->
             <div class="mb-8 border-b border-slate-200 pb-8">
                 <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-chalkboard-teacher mr-2"></i>II. Bidang Pendidikan</h2>
                 
@@ -109,7 +105,6 @@
                 </div>
             </div>
 
-            <!-- III. PENELITIAN -->
             <div class="mb-8 border-b border-slate-200 pb-8">
                 <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-microscope mr-2"></i>III. Bidang Penelitian</h2>
                 <div class="grid grid-cols-1 gap-5">
@@ -130,7 +125,6 @@
                 </div>
             </div>
 
-            <!-- IV. PENGABDIAN -->
             <div class="mb-6">
                 <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-5"><i class="fas fa-hands-helping mr-2"></i>IV. Bidang Pengabdian Masyarakat</h2>
                 <div class="grid grid-cols-1 gap-5">
@@ -151,7 +145,6 @@
                 </div>
             </div>
 
-            <!-- TOMBOL SUBMIT -->
             <div class="pt-6 border-t border-slate-100 flex justify-end">
                 <button type="button" id="btn-submit" onclick="siapkanLaporan()" class="text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-lg text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-md">
                     <i class="fas fa-file-signature"></i> Buat Laporan & Pratinjau
@@ -159,7 +152,6 @@
             </div>
         </div>
 
-        <!-- BAGIAN KANAN: RIWAYAT -->
         <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
             <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
                 <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
@@ -175,7 +167,6 @@
         </div>
     </main>
 
-    <!-- MODAL PRATINJAU PDF (LANDSCAPE) -->
     <div id="preview-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm overflow-y-auto flex items-start justify-center pt-8 pb-10 px-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-[1100px] overflow-hidden flex flex-col mt-2">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
@@ -194,13 +185,11 @@
             <div class="p-6 bg-slate-300 flex justify-center overflow-x-auto custom-scrollbar">
                 <div id="pdf-template-wrapper" class="shadow-2xl bg-white">
                     
-                    <!-- Ukuran pasti A4 Landscape (297mm x 210mm) -->
                     <div id="pdf-template" style="width: 297mm; min-height: 210mm; background: white; padding: 15mm 20mm; box-sizing: border-box; font-family: Arial, sans-serif; color: #000;">
                         
                         <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">I. IDENTITAS</div>
                         <div id="pdf-identitas" style="display: grid; grid-template-columns: 220px 15px 1fr; gap: 4px; font-size: 13px; margin-bottom: 20px; line-height: 1.4;">
-                            <!-- Diisi Otomatis -->
-                        </div>
+                            </div>
 
                         <table class="pdf-table">
                             <thead>
@@ -220,8 +209,7 @@
                                 </tr>
                             </thead>
                             <tbody id="pdf-table-body">
-                                <!-- Diisi JavaScript -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
 
@@ -235,7 +223,7 @@
         
         let allDosenData = {}; 
         let currentDosenDetail = {};
-        let riwayatCache = []; // Menyimpan data riwayat untuk bisa diklik ulang
+        let riwayatCache = [];
 
         function formatTanggal(isoString) {
             if (!isoString || isoString === '-') return '-';
@@ -327,55 +315,67 @@
             const tbody = document.getElementById("pdf-table-body");
             let tableHtml = `<tr><td colspan="8" class="bg-gray">II. BIDANG PENDIDIKAN</td></tr>`;
 
-            // Cek apakah data dari klik riwayat atau input manual form
-            const matkulArr = dataRinci.matkulList ? dataRinci.matkulList.split(', ') : [];
+            const matkulArr = dataRinci.matkulList && dataRinci.matkulList.trim() !== "" ? dataRinci.matkulList.split(', ') : [];
             
-            matkulArr.forEach((mk, index) => {
+            if(matkulArr.length > 0) {
+                matkulArr.forEach((mk, index) => {
+                    tableHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td class="text-left">${mk}</td>
+                            <td>${formatLink(dataRinci.st_dosen, "Surat Tugas")}</td>
+                            <td>2</td>
+                            <td>6 Bulan</td>
+                            <td>${formatLink(dataRinci.absen_nilai, "Absen & Nilai")}</td>
+                            <td>100 &nbsp; 1</td>
+                            <td>SELESAI</td>
+                        </tr>
+                    `;
+                });
+            } else {
                 tableHtml += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td class="text-left">${mk}</td>
-                        <td>${formatLink(dataRinci.st_dosen, "Surat Tugas")}</td>
-                        <td>2</td>
-                        <td>6 Bulan</td>
-                        <td>${formatLink(dataRinci.absen_nilai, "Absen & Nilai")}</td>
-                        <td>100</td>
-                        <td>SELESAI</td>
-                    </tr>
-                `;
-            });
-            
-            if(dataRinci.judul_penelitian) {
-                tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
-                tableHtml += `
-                    <tr>
-                        <td>1</td>
-                        <td class="text-left font-bold">${dataRinci.judul_penelitian}</td>
-                        <td>${formatLink(dataRinci.st_penelitian, "Surat Tugas Penelitian")}</td>
-                        <td>3</td>
-                        <td>6 Bulan</td>
-                        <td>${formatLink(dataRinci.lap_penelitian, "Laporan Penelitian")}</td>
-                        <td>100</td>
-                        <td>SELESAI</td>
-                    </tr>
-                `;
+                        <tr>
+                            <td>1</td>
+                            <td class="text-left">-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    `;
             }
+            
+            // BIDANG PENELITIAN
+            tableHtml += `<tr><td colspan="8" class="bg-gray">III. BIDANG PENELITIAN</td></tr>`;
+            tableHtml += `
+                <tr>
+                    <td>1</td>
+                    <td class="text-left font-bold">${dataRinci.judul_penelitian || '-'}</td>
+                    <td>${formatLink(dataRinci.st_penelitian, "Surat Tugas Penelitian")}</td>
+                    <td>3</td>
+                    <td>6 Bulan</td>
+                    <td>${formatLink(dataRinci.lap_penelitian, "Laporan Penelitian")}</td>
+                    <td>100</td>
+                    <td>SELESAI</td>
+                </tr>
+            `;
 
-            if(dataRinci.judul_pengabdian) {
-                tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
-                tableHtml += `
-                    <tr>
-                        <td>1</td>
-                        <td class="text-left font-bold">${dataRinci.judul_pengabdian}</td>
-                        <td>${formatLink(dataRinci.st_pengabdian, "Surat Tugas Pengabdian")}</td>
-                        <td>3</td>
-                        <td>6 Bulan</td>
-                        <td>${formatLink(dataRinci.lap_pengabdian, "Laporan Pengabdian")}</td>
-                        <td>100</td>
-                        <td>SELESAI</td>
-                    </tr>
-                `;
-            }
+            // BIDANG PENGABDIAN
+            tableHtml += `<tr><td colspan="8" class="bg-gray">IV. BIDANG PENGABDIAN KEPADA MASYARAKAT</td></tr>`;
+            tableHtml += `
+                <tr>
+                    <td>1</td>
+                    <td class="text-left font-bold">${dataRinci.judul_pengabdian || '-'}</td>
+                    <td>${formatLink(dataRinci.st_pengabdian, "Surat Tugas Pengabdian")}</td>
+                    <td>1</td>
+                    <td>6 Bulan</td>
+                    <td>${formatLink(dataRinci.lap_pengabdian, "Laporan Pengabdian")}</td>
+                    <td>100</td>
+                    <td>SELESAI</td>
+                </tr>
+            `;
 
             tbody.innerHTML = tableHtml;
         }
@@ -384,7 +384,6 @@
             const item = riwayatCache[index];
             if (!item) return;
 
-            // Cari detail dosen dari memori berdasarkan nama di riwayat
             const d = allDosenData[item.namaDosen];
             if (!d) {
                 alert("Data detail dosen tidak ditemukan di sistem.");
@@ -393,7 +392,6 @@
 
             currentDosenDetail = d;
 
-            // Render identitas ke template PDF
             const html = `
                 <div>Nama Dosen Beserta Gelar</div><div>:</div><div class="font-bold">${d.nama || '-'}</div>
                 <div>Tanggal Lahir</div><div>:</div><div>${formatTanggal(d.tanggalLahir)}</div>
@@ -406,10 +404,8 @@
             `;
             document.getElementById('pdf-identitas').innerHTML = html;
 
-            // Buat isi tabel berdasarkan data riwayat yang disimpan
             generateTableContent(item);
 
-            // Munculkan Modal Pratinjau
             document.getElementById('preview-modal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
@@ -467,7 +463,6 @@
                 btn.innerHTML = temp;
                 btn.disabled = false;
                 
-                // Tambahkan data baru ke cache riwayat secara real-time
                 if(resData.riwayat) {
                     riwayatCache = resData.riwayat;
                     renderRiwayat(riwayatCache);
