@@ -29,19 +29,27 @@
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
 
-    <!-- HEADER -->
+    <!-- HEADER DENGAN NAVIGASI ATAS -->
     <header class="w-full bg-emerald-800 text-white px-6 md:px-10 py-10 rounded-b-[1.5rem] shadow-timbul relative z-10">
-        <div class="relative z-10 flex flex-col items-start text-left w-full mx-auto">
-            <span class="text-[10px] md:text-xs font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
-            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-white">Pendataan Publikasi Ilmiah</h1>
-            <p class="text-emerald-100 text-sm md:text-base mt-2 max-w-2xl">Lengkapi data artikel jurnal ilmiah yang telah Anda publikasikan beserta riwayatnya.</p>
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full mx-auto">
             
-            <div class="mt-6">
-                <!-- Ubah tanda '#' menjadi link file index.html / LBKD Anda agar bisa bolak-balik -->
-                <a href="index.html" class="inline-flex items-center text-sm font-semibold text-emerald-100 hover:text-white transition-colors bg-emerald-700/50 hover:bg-emerald-600 px-4 py-2 rounded-lg mt-4 border border-emerald-600">
-    <i class="fas fa-arrow-left mr-2"></i> Kembali ke Form LBKD
-</a>
+            <!-- KIRI: Judul & Keterangan -->
+            <div>
+                <span class="text-[10px] md:text-xs font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 block">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
+                <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-white">Pendataan Publikasi Ilmiah</h1>
+                <p class="text-emerald-100 text-sm md:text-base mt-2 max-w-2xl">Lengkapi data artikel jurnal ilmiah yang telah Anda publikasikan beserta riwayatnya.</p>
             </div>
+
+            <!-- KANAN: Menu Navigasi (Standar Web Modern) -->
+            <nav class="flex flex-wrap items-center gap-6 text-sm font-bold tracking-wide uppercase">
+                <a href="index.html" class="text-emerald-300 hover:text-white transition-colors pb-1 border-b-2 border-transparent hover:border-emerald-300">
+                    Form LBKD
+                </a>
+                <a href="publikasi.html" class="text-white border-b-2 border-white pb-1">
+                    Publikasi
+                </a>
+            </nav>
+
         </div>
     </header>
 
@@ -150,7 +158,6 @@
     </footer>
 
     <script>
-        // GANTI DENGAN URL DEPLOYMENT ANDA YANG BARU!
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
 
         document.addEventListener("DOMContentLoaded", loadDatabase);
@@ -166,14 +173,12 @@
                     alert("Error Database: " + data.pesan); return;
                 }
 
-                // Render Dropdown Dosen
                 const dropdown = document.getElementById("namaDosen");
                 dropdown.innerHTML = '<option value="" disabled selected>-- Pilih Nama Dosen --</option>';
                 if(data.dosen) {
                     data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
                 }
 
-                // Render Riwayat Publikasi Khusus
                 if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
                     let html = '';
                     data.riwayatPublikasi.slice(0, 15).forEach((item) => {
@@ -213,7 +218,6 @@
             btn.disabled = true;
 
             const formData = new URLSearchParams();
-            // FLAG PENTING agar Code.gs tahu ini dari form Publikasi!
             formData.append('formType', 'publikasi'); 
             
             formData.append('namaDosen', document.getElementById("namaDosen").value);
@@ -237,7 +241,7 @@
                 if (resData.status === "sukses") {
                     alert("Data publikasi berhasil disimpan!");
                     document.getElementById("formPublikasi").reset();
-                    loadDatabase(); // Refresh tabel
+                    loadDatabase(); 
                 } else {
                     alert("Gagal menyimpan data: " + resData.pesan);
                 }
