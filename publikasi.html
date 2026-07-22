@@ -30,11 +30,18 @@
         
         .a4-container {
             width: 210mm;
+            max-width: 100%;
             padding: 20mm;
             margin: 0 auto;
             background: white;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             box-sizing: border-box;
+            overflow-x: auto;
+        }
+        
+        /* Agar tabel di modal HP bisa di-scroll secara horizontal jika terlalu lebar */
+        .a4-container table {
+            min-width: 600px;
         }
     </style>
 </head>
@@ -367,21 +374,45 @@
             const element = document.getElementById('areaCetakPDF');
             const btn = document.getElementById('btn-cetak');
             const originalText = btn.innerHTML;
+            
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btn.disabled = true;
+
+            // Simpan ukuran dan batas awal elemen
+            const originalWidth = element.style.width;
+            const originalMaxWidth = element.style.maxWidth;
+
+            // Secara paksa kita atur lebar dokumen sebesar A4 standar 
+            // Hal ini untuk menghindari terpotong / layarnya putih saat di-render via smartphone
+            element.style.width = '794px'; 
+            element.style.maxWidth = '794px';
 
             const opt = {
                 margin:       0, 
                 filename:     `Data_Publikasi_${namaDosenAktif}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    scrollY: 0, // Kunci Utama: memastikan tidak kosong apabila discroll
+                    scrollX: 0
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
+                // Kembalikan ukuran asli agar tampilan CSS tidak rusak setelah diunduh
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }).catch(err => {
+                // Kembalikan ukuran asli apabila terjadi kegagalan
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+
                 console.error("Gagal membuat PDF: ", err);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -491,4 +522,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
