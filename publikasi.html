@@ -25,6 +25,21 @@
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Styling Container Pratinjau Kertas A4 Potret */
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-sizing: border-box;
+        }
+        @media print {
+            body { background: none; }
+            .a4-container { margin: 0; box-shadow: none; width: 100%; min-height: auto; }
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
@@ -59,6 +74,25 @@
         <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full">
             <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-6 border-b border-slate-200 pb-3"><i class="fas fa-edit mr-2"></i>Form Input Publikasi</h2>
             
+            <!-- PRATINJAU KERTAS A4 -->
+            <div class="a4-container mb-8">
+                <!-- KOP SURAT -->
+                <div style="text-align: center; line-height: 1.1;">
+                    <div style="font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
+                    <div style="font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
+                    <div style="font-size: 18px; font-weight: bold; margin: 1px 0;">جامعة&nbsp;الإمام&nbsp;الشافعي</div>
+                    <div style="font-size: 11px; margin-top: 2px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
+                    <div style="font-size: 11px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+                </div>
+                
+                <!-- GARIS PEMBATAS KOP -->
+                <div style="margin-top: 6px; margin-bottom: 1px; border-bottom: 2.5px solid black;"></div>
+                <div style="margin-bottom: 8px; border-bottom: 1px solid black;"></div>
+
+                <!-- JUDUL LAPORAN -->
+                <h2 style="font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 8px; text-transform: uppercase;">LAPORAN BEBAN KINERJA DOSEN</h2>
+            </div>
+
             <form id="formPublikasi" onsubmit="simpanPublikasi(event)" class="space-y-5">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -215,12 +249,9 @@
             let html = '';
             // Tambahkan (item, index) agar bisa melacak baris mana yang diklik
             riwayatArray.slice(0, 15).forEach((item, index) => {
-                let dateStr = "Tanpa Tanggal";
-                if(item.timestamp) {
-                    dateStr = new Date(item.timestamp).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year:'numeric'});
-                }
-
+                let dateStr = new Date(item.timestamp).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year:'numeric'});
                 html += `
+                    <!-- Tambahkan cursor-pointer dan onclick -->
                     <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100 cursor-pointer" onclick="tampilkanPratinjau(${index})">
                         <td class="p-4 align-top">
                             <div class="flex justify-between items-center mb-1">
@@ -229,9 +260,10 @@
                             </div>
                             <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
                             <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel}</div>
-                            <div class="text-[10px] text-slate-500 mt-1"><i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal} (Vol ${item.volume || '-'}, No ${item.nomor || '-'})</div>
+                            <div class="text-[10px] text-slate-500 mt-1"><i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal} (Vol ${item.volume}, No ${item.nomor})</div>
                             <div class="text-[10px] font-semibold text-emerald-600 mt-1"><i class="fas fa-certificate mr-1"></i> ${item.indeksasi || '-'}</div>
                             <div class="mt-2">
+                                <!-- Tambahkan onclick="event.stopPropagation()" agar klik link tidak ikut men-trigger pratinjau baris -->
                                 <a href="${item.linkArtikel}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold text-blue-600 hover:underline"><i class="fas fa-external-link-alt"></i> Buka Artikel</a>
                             </div>
                         </td>
@@ -240,7 +272,6 @@
             });
             tbody.innerHTML = html;
         }
-
         // Fungsi baru untuk memasukkan data ke Form sebagai pratinjau (Versi Robust/Tahan Banting)
         function tampilkanPratinjau(index) {
             const data = riwayatCache[index];
@@ -264,9 +295,6 @@
                         const optText = select.options[i].text.toLowerCase().trim();
                         const optVal = select.options[i].value.toLowerCase().trim();
                         
-                        // PERBAIKAN: Abaikan option yang valuenya kosong (seperti default "Pilih...")
-                        if (!optVal) continue; 
-                        
                         // Jika opsi mengandung kata dari target, atau target mengandung kata dari opsi
                         if (optText.includes(lowerTarget) || lowerTarget.includes(optVal) || lowerTarget.includes(optText)) {
                             select.selectedIndex = i;
@@ -287,14 +315,10 @@
             document.getElementById("volume").value = data.volume || "";
             document.getElementById("nomor").value = data.nomor || "";
             
-            // PERBAIKAN: Konversi format tanggal menjadi format lokal (YYYY-MM-DD) agar tidak mundur 1 hari
+            // Konversi format tanggal agar sesuai dengan input type="date" (YYYY-MM-DD)
             if (data.tanggalTerbit) {
                 try {
-                    const d = new Date(data.tanggalTerbit);
-                    const year = d.getFullYear();
-                    const month = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
-                    document.getElementById("tanggalTerbit").value = `${year}-${month}-${day}`;
+                    document.getElementById("tanggalTerbit").value = new Date(data.tanggalTerbit).toISOString().split('T')[0];
                 } catch(e) {
                     document.getElementById("tanggalTerbit").value = "";
                 }
