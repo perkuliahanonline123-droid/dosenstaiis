@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#065f46">
+    <title>Formulir Publikasi Dosen</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    boxShadow: { 'timbul': '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
+
+    <!-- HEADER -->
+    <header class="w-full bg-emerald-800 text-white px-6 md:px-10 py-10 rounded-b-[1.5rem] shadow-timbul relative z-10">
+        <div class="relative z-10 flex flex-col items-start text-left w-full mx-auto">
+            <span class="text-[10px] md:text-xs font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
+            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-white">Pendataan Publikasi Ilmiah</h1>
+            <p class="text-emerald-100 text-sm md:text-base mt-2 max-w-2xl">Lengkapi data artikel jurnal ilmiah yang telah Anda publikasikan beserta riwayatnya.</p>
+            
+            <div class="mt-6">
+                <!-- Ubah tanda '#' menjadi link file index.html / LBKD Anda agar bisa bolak-balik -->
+                <a href="#" class="inline-flex items-center gap-2 px-5 py-2 hover:bg-white/10 text-emerald-100 text-sm font-bold rounded-lg transition-colors border border-emerald-600">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Form LBKD
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full mx-auto px-6 md:px-10 mt-8 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- FORMULIR INPUT -->
+        <div class="lg:col-span-7 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-6 border-b border-slate-200 pb-3"><i class="fas fa-edit mr-2"></i>Form Input Publikasi</h2>
+            
+            <form id="formPublikasi" onsubmit="simpanPublikasi(event)" class="space-y-5">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Nama Dosen <span class="text-emerald-600">*</span></label>
+                        <select id="namaDosen" required class="bg-slate-50 border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="">-- Menghubungkan ke Database... --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Sebagai Penulis <span class="text-emerald-600">*</span></label>
+                        <select id="sebagaiPenulis" required class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="" disabled selected>Pilih Peran...</option>
+                            <option value="Penulis Pertama">Penulis Pertama</option>
+                            <option value="Penulis Korespondensi">Penulis Korespondensi</option>
+                            <option value="Anggota / Penulis Kedua dst">Anggota / Penulis Kedua, dst</option>
+                            <option value="Penulis Tunggal">Penulis Tunggal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Judul Artikel <span class="text-emerald-600">*</span></label>
+                    <input type="text" id="judulArtikel" required placeholder="Tuliskan judul artikel secara lengkap..." class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Nama Jurnal <span class="text-emerald-600">*</span></label>
+                    <input type="text" id="namaJurnal" required placeholder="Contoh: Jurnal Ahwal Al-Syakhshiyyah" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Volume</label>
+                        <input type="text" id="volume" placeholder="Contoh: Vol. 5" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Nomor</label>
+                        <input type="text" id="nomor" placeholder="Contoh: No. 1" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Tanggal Terbit</label>
+                        <input type="date" id="tanggalTerbit" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Link Artikel Jurnal <span class="text-emerald-600">*</span></label>
+                        <input type="url" id="linkArtikel" required placeholder="https://..." class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Indeksasi Jurnal</label>
+                        <input type="text" id="indeksasi" placeholder="Contoh: SINTA 2, Scopus, dll" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Biaya APC (Rp) <span class="text-[10px] text-slate-400 lowercase font-normal ml-1">Kosongkan jika gratis</span></label>
+                        <input type="text" id="apc" placeholder="Contoh: 500000" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Link Bukti Transfer APC (G-Drive)</label>
+                        <input type="url" id="buktiApc" placeholder="https://drive.google.com/..." class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 flex justify-end">
+                    <button type="submit" id="btn-submit" class="text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-lg text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-md transition-colors">
+                        <i class="fas fa-save"></i> Simpan Publikasi
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIWAYAT UPLOAD -->
+        <div class="lg:col-span-5 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
+            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
+                <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Riwayat Publikasi</h2>
+                <button onclick="loadDatabase()" class="text-slate-400 hover:text-emerald-600 transition" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div id="historyTableContainer" class="overflow-y-auto max-h-[600px] custom-scrollbar">
+                <table class="min-w-full divide-y divide-slate-200 text-left">
+                    <tbody id="historyBody" class="divide-y divide-slate-100 bg-white">
+                        <tr><td class="p-5 text-center text-xs text-slate-500">Memuat riwayat publikasi...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="w-full text-center py-6 text-slate-400 text-xs font-semibold tracking-wider mt-auto bg-transparent border-t border-slate-200">
+        &copy; 2026 Layanan Administrasi Akademik
+    </footer>
+
+    <script>
+        // GANTI DENGAN URL DEPLOYMENT ANDA YANG BARU!
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
+
+        document.addEventListener("DOMContentLoaded", loadDatabase);
+
+        function loadDatabase() {
+            const tbody = document.getElementById('historyBody');
+            tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat riwayat...</td></tr>';
+
+            fetch(SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "gagal") {
+                    alert("Error Database: " + data.pesan); return;
+                }
+
+                // Render Dropdown Dosen
+                const dropdown = document.getElementById("namaDosen");
+                dropdown.innerHTML = '<option value="" disabled selected>-- Pilih Nama Dosen --</option>';
+                if(data.dosen) {
+                    data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
+                }
+
+                // Render Riwayat Publikasi Khusus
+                if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
+                    let html = '';
+                    data.riwayatPublikasi.slice(0, 15).forEach((item) => {
+                        let dateStr = new Date(item.timestamp).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year:'numeric'});
+                        html += `
+                            <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100">
+                                <td class="p-4 align-top">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[10px] font-bold text-slate-400">${dateStr}</span>
+                                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">${item.sebagaiPenulis}</span>
+                                    </div>
+                                    <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
+                                    <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel}</div>
+                                    <div class="text-[10px] text-slate-500 mt-1"><i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal} (Vol ${item.volume}, No ${item.nomor})</div>
+                                    <div class="mt-2">
+                                        <a href="${item.linkArtikel}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline"><i class="fas fa-external-link-alt"></i> Buka Artikel</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada data publikasi terdaftar.</td></tr>';
+                }
+            }).catch(err => {
+                tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-red-400">Koneksi database gagal.</td></tr>';
+            });
+        }
+
+        function simpanPublikasi(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById("btn-submit");
+            const temp = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
+            btn.disabled = true;
+
+            const formData = new URLSearchParams();
+            // FLAG PENTING agar Code.gs tahu ini dari form Publikasi!
+            formData.append('formType', 'publikasi'); 
+            
+            formData.append('namaDosen', document.getElementById("namaDosen").value);
+            formData.append('sebagaiPenulis', document.getElementById("sebagaiPenulis").value);
+            formData.append('judulArtikel', document.getElementById("judulArtikel").value);
+            formData.append('namaJurnal', document.getElementById("namaJurnal").value);
+            formData.append('volume', document.getElementById("volume").value);
+            formData.append('nomor', document.getElementById("nomor").value);
+            formData.append('tanggalTerbit', document.getElementById("tanggalTerbit").value);
+            formData.append('linkArtikel', document.getElementById("linkArtikel").value);
+            formData.append('indeksasi', document.getElementById("indeksasi").value);
+            formData.append('apc', document.getElementById("apc").value);
+            formData.append('buktiApc', document.getElementById("buktiApc").value);
+
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(resData => {
+                btn.innerHTML = temp;
+                btn.disabled = false;
+                
+                if (resData.status === "sukses") {
+                    alert("Data publikasi berhasil disimpan!");
+                    document.getElementById("formPublikasi").reset();
+                    loadDatabase(); // Refresh tabel
+                } else {
+                    alert("Gagal menyimpan data: " + resData.pesan);
+                }
+            }).catch(e => {
+                btn.innerHTML = temp;
+                btn.disabled = false;
+                alert("Kesalahan jaringan saat menyimpan.");
+            });
+        }
+    </script>
+</body>
+</html>
