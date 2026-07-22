@@ -32,15 +32,13 @@
         /* Styling Container Pratinjau Kertas A4 Potret */
         .a4-container {
             width: 210mm;
-            min-height: 297mm;
+            /* min-height DIHAPUS agar tidak meluber ke halaman 2 saat di-convert ke PDF */
             padding: 20mm;
             margin: 0 auto;
             background: white;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             box-sizing: border-box;
         }
-
-        /* Karena kita menggunakan html2pdf, kita tidak lagi mengandalkan @media print murni bawaan browser */
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
@@ -59,7 +57,7 @@
             <!-- KANAN: Menu Navigasi -->
             <nav class="flex flex-wrap items-center gap-6 text-sm font-bold tracking-wide uppercase">
                 <a href="index.html" class="text-emerald-300 hover:text-white transition-colors pb-1 border-b-2 border-transparent hover:border-emerald-300">
-                    Laporan Kinerja Dosen
+                    Form LBKD
                 </a>
                 <a href="publikasi.html" class="text-white border-b-2 border-white pb-1">
                     Publikasi
@@ -351,27 +349,24 @@
 
         // FUNGSI BARU: Direct Download ke PDF menggunakan html2pdf
         function cetakPDF() {
-            // Targetkan elemen kertas A4 yang mau disimpan ke PDF
             const element = document.getElementById('areaCetakPDF');
             
-            // Ubah tombol untuk memberikan indikator loading kepada user
             const btn = document.getElementById('btn-cetak');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btn.disabled = true;
 
-            // Pengaturan untuk output PDF
+            // Pengaturan output PDF - Memastikan unit mm agar akurat dengan A4
             const opt = {
-                margin:       0, // Margin ditangani oleh padding di CSS .a4-container
+                margin:       0, 
                 filename:     `Data_Publikasi_${namaDosenAktif}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             // Memproses PDF dan Mengunduhnya
             html2pdf().set(opt).from(element).save().then(() => {
-                // Mengembalikan tombol seperti semula setelah selesai
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }).catch(err => {
