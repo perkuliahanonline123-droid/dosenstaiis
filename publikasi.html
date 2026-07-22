@@ -238,14 +238,44 @@
             });
             tbody.innerHTML = html;
         }
-        // Fungsi baru untuk memasukkan data ke Form sebagai pratinjau
+        // Fungsi baru untuk memasukkan data ke Form sebagai pratinjau (Versi Robust/Tahan Banting)
         function tampilkanPratinjau(index) {
             const data = riwayatCache[index];
             if (!data) return;
 
-            // Mengisi kembali nilai form
-            document.getElementById("namaDosen").value = data.namaDosen || "";
-            document.getElementById("sebagaiPenulis").value = data.sebagaiPenulis || "";
+            // Fungsi pembantu untuk mencocokkan dropdown meskipun teks tidak sama persis 100%
+            function setDropdown(elementId, targetValue) {
+                const select = document.getElementById(elementId);
+                if (!targetValue) {
+                    select.value = "";
+                    return;
+                }
+                
+                // 1. Coba pilih secara langsung (jika teksnya sama persis)
+                select.value = targetValue;
+                
+                // 2. Jika gagal (masih kosong/kembali ke default), cari opsi yang mengandung kata yang mirip
+                if (select.selectedIndex <= 0) {
+                    const lowerTarget = targetValue.toString().toLowerCase().trim();
+                    for (let i = 0; i < select.options.length; i++) {
+                        const optText = select.options[i].text.toLowerCase().trim();
+                        const optVal = select.options[i].value.toLowerCase().trim();
+                        
+                        // Jika opsi mengandung kata dari target, atau target mengandung kata dari opsi
+                        if (optText.includes(lowerTarget) || lowerTarget.includes(optVal) || lowerTarget.includes(optText)) {
+                            select.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Gunakan fungsi pembantu untuk dropdown
+            setDropdown("namaDosen", data.namaDosen);
+            setDropdown("sebagaiPenulis", data.sebagaiPenulis);
+            setDropdown("indeksasi", data.indeksasi);
+
+            // Mengisi input teks standar
             document.getElementById("judulArtikel").value = data.judulArtikel || "";
             document.getElementById("namaJurnal").value = data.namaJurnal || "";
             document.getElementById("volume").value = data.volume || "";
@@ -263,7 +293,6 @@
             }
 
             document.getElementById("linkArtikel").value = data.linkArtikel || "";
-            document.getElementById("indeksasi").value = data.indeksasi || "";
             document.getElementById("apc").value = data.apc || "";
             document.getElementById("buktiApc").value = data.buktiApc || "";
 
