@@ -238,6 +238,38 @@
             });
             tbody.innerHTML = html;
         }
+        // Fungsi baru untuk memasukkan data ke Form sebagai pratinjau
+        function tampilkanPratinjau(index) {
+            const data = riwayatCache[index];
+            if (!data) return;
+
+            // Mengisi kembali nilai form
+            document.getElementById("namaDosen").value = data.namaDosen || "";
+            document.getElementById("sebagaiPenulis").value = data.sebagaiPenulis || "";
+            document.getElementById("judulArtikel").value = data.judulArtikel || "";
+            document.getElementById("namaJurnal").value = data.namaJurnal || "";
+            document.getElementById("volume").value = data.volume || "";
+            document.getElementById("nomor").value = data.nomor || "";
+            
+            // Konversi format tanggal agar sesuai dengan input type="date" (YYYY-MM-DD)
+            if (data.tanggalTerbit) {
+                try {
+                    document.getElementById("tanggalTerbit").value = new Date(data.tanggalTerbit).toISOString().split('T')[0];
+                } catch(e) {
+                    document.getElementById("tanggalTerbit").value = "";
+                }
+            } else {
+                document.getElementById("tanggalTerbit").value = "";
+            }
+
+            document.getElementById("linkArtikel").value = data.linkArtikel || "";
+            document.getElementById("indeksasi").value = data.indeksasi || "";
+            document.getElementById("apc").value = data.apc || "";
+            document.getElementById("buktiApc").value = data.buktiApc || "";
+
+            // Menambahkan scroll halus agar layar kembali ke atas menuju area form (Berguna untuk HP)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         // 4. Proses Fetch data di latar belakang
         function fetchDataLatarBelakang() {
