@@ -34,11 +34,11 @@
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full mx-auto">
             
             <!-- KIRI: Judul & Keterangan -->
-<div>
-    <span class="text-sm md:text-base font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 block">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
-    <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-wide text-white">Pendataan Publikasi Ilmiah</h1>
-    <p class="text-emerald-100 text-base md:text-lg mt-2 max-w-2xl">Lengkapi data artikel jurnal ilmiah yang telah Anda publikasikan beserta riwayatnya.</p>
-</div>
+            <div>
+                <span class="text-sm md:text-base font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 block">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
+                <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-wide text-white">Pendataan Publikasi Ilmiah</h1>
+                <p class="text-emerald-100 text-base md:text-lg mt-2 max-w-2xl">Lengkapi data artikel jurnal ilmiah yang telah Anda publikasikan beserta riwayatnya.</p>
+            </div>
 
             <!-- KANAN: Menu Navigasi (Standar Web Modern) -->
             <nav class="flex flex-wrap items-center gap-6 text-sm font-bold tracking-wide uppercase">
@@ -56,7 +56,7 @@
     <main class="w-full mx-auto px-6 md:px-10 mt-8 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- FORMULIR INPUT -->
-        <div class="lg:col-span-7 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full">
+        <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full">
             <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-6 border-b border-slate-200 pb-3"><i class="fas fa-edit mr-2"></i>Form Input Publikasi</h2>
             
             <form id="formPublikasi" onsubmit="simpanPublikasi(event)" class="space-y-5">
@@ -111,8 +111,20 @@
                         <input type="url" id="linkArtikel" required placeholder="https://..." class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
                     </div>
                     <div>
-                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Indeksasi Jurnal</label>
-                        <input type="text" id="indeksasi" placeholder="Contoh: SINTA 2, Scopus, dll" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Indeksasi Jurnal <span class="text-emerald-600">*</span></label>
+                        <select id="indeksasi" required class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="" disabled selected>Pilih Indeksasi Jurnal...</option>
+                            <option value="SINTA 1">SINTA 1</option>
+                            <option value="SINTA 2">SINTA 2</option>
+                            <option value="SINTA 3">SINTA 3</option>
+                            <option value="SINTA 4">SINTA 4</option>
+                            <option value="SINTA 5">SINTA 5</option>
+                            <option value="SINTA 6">SINTA 6</option>
+                            <option value="Scopus">Scopus</option>
+                            <option value="Web of Science (WoS)">Web of Science (WoS)</option>
+                            <option value="Internasional Bereputasi Lainnya">Internasional Bereputasi Lainnya</option>
+                            <option value="Nasional Belum Terakreditasi / Lainnya">Nasional Belum Terakreditasi / Lainnya</option>
+                        </select>
                     </div>
                 </div>
 
@@ -147,7 +159,7 @@
                     </div>
                     <span class="text-[10px] text-slate-400 italic hidden md:inline">Klik untuk pratinjau</span>
                 </div>
-            </div> <!-- BATAS PERBAIKAN: Penutup header diletakkan di sini agar tabel di bawahnya full-width -->
+            </div> 
             <div id="historyTableContainer" class="overflow-y-auto max-h-[530px] custom-scrollbar bg-white">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
                     <tbody id="historyBody" class="divide-y divide-slate-100 bg-white">
@@ -169,61 +181,85 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
 
-        const CACHE_KEY = 'data_lbkd_cache';
+        // 1. Membedakan Key Cache Khusus Halaman Publikasi
+        const CACHE_KEY_PUBLIKASI = 'data_publikasi_cache';
+        let riwayatCache = [];
 
-        // Fungsi terpisah untuk memproses dan menampilkan data agar bisa dipanggil oleh Cache & Fetch
-        function renderDataAplikasi(data) {
-            allDosenData = data.detailDosen || {};
-            allSksData = data.sksData || {};
-
-            const dropdown = document.getElementById("dosenDropdown");
-            dropdown.innerHTML = '<option value="">-- Pilih Nama Dosen --</option>';
+        // 2. Fungsi untuk menampilkan data ke layar (Dosen & Tabel Riwayat)
+        function renderDataPublikasi(data) {
+            // -- Render Dropdown Dosen --
+            const dropdown = document.getElementById("namaDosen");
+            const valueSebelumnya = dropdown.value; // Simpan jika sedang memilih
+            
+            dropdown.innerHTML = '<option value="" disabled selected>-- Pilih Nama Dosen --</option>';
             if(data.dosen) {
                 data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
             }
-            
-            const mkContainer = document.getElementById("matkulCheckboxList");
-            mkContainer.innerHTML = '';
-            if(data.matkul) {
-                data.matkul.forEach(mk => {
-                    mkContainer.innerHTML += `
-                        <label class="flex items-start space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer">
-                            <input type="checkbox" name="matakuliah" value="${mk}" class="mt-0.5 w-4 h-4 text-emerald-600 border-slate-300 rounded accent-emerald-600 shrink-0">
-                            <span class="leading-tight">${mk}</span>
-                        </label>
-                    `;
-                });
+            if(valueSebelumnya) dropdown.value = valueSebelumnya;
+
+            // -- Render Riwayat Publikasi --
+            const tbody = document.getElementById('historyBody');
+            if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
+                riwayatCache = data.riwayatPublikasi;
+                renderTabelRiwayat(riwayatCache);
+            } else {
+                tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada data publikasi terdaftar.</td></tr>';
             }
-            
-            riwayatCache = data.riwayat || [];
-            renderRiwayat(riwayatCache);
         }
 
-        // Dijalankan saat halaman pertama kali dimuat
-        document.addEventListener("DOMContentLoaded", () => {
-            // 1. Cek Cache Lokal terlebih dahulu
-            const cachedData = localStorage.getItem(CACHE_KEY);
-            if (cachedData) {
-                try {
-                    const parsedData = JSON.parse(cachedData);
-                    renderDataAplikasi(parsedData); // Tampilkan seketika dari cache
-                } catch(e) {
-                    console.error("Gagal membaca cache:", e);
-                }
-            }
+        // 3. Fungsi membuat struktur HTML tabel Riwayat
+        function renderTabelRiwayat(riwayatArray) {
+            const tbody = document.getElementById('historyBody');
+            let html = '';
+            riwayatArray.slice(0, 15).forEach((item) => {
+                let dateStr = new Date(item.timestamp).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year:'numeric'});
+                html += `
+                    <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100">
+                        <td class="p-4 align-top">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-slate-400">${dateStr}</span>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">${item.sebagaiPenulis}</span>
+                            </div>
+                            <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
+                            <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel}</div>
+                            <div class="text-[10px] text-slate-500 mt-1"><i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal} (Vol ${item.volume}, No ${item.nomor})</div>
+                            <div class="text-[10px] font-semibold text-emerald-600 mt-1"><i class="fas fa-certificate mr-1"></i> ${item.indeksasi || '-'}</div>
+                            <div class="mt-2">
+                                <a href="${item.linkArtikel}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline"><i class="fas fa-external-link-alt"></i> Buka Artikel</a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
 
-            // 2. Ambil data terbaru di latar belakang (Background Fetch)
+        // 4. Proses Fetch data di latar belakang
+        function fetchDataLatarBelakang() {
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
                 if (data.status !== "gagal") {
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(data)); // Simpan ke cache
-                    renderDataAplikasi(data); // Perbarui tampilan dengan data terbaru
+                    localStorage.setItem(CACHE_KEY_PUBLIKASI, JSON.stringify(data)); // Simpan ke Cache Publikasi
+                    renderDataPublikasi(data);
                 }
             }).catch(err => console.log("Gagal sinkronisasi data latar belakang."));
+        }
+
+        // 5. Dijalankan pertama kali saat Web dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            const cachedData = localStorage.getItem(CACHE_KEY_PUBLIKASI);
+            if (cachedData) {
+                try {
+                    const parsedData = JSON.parse(cachedData);
+                    renderDataPublikasi(parsedData); // Tampilkan cache secara instan (Hitungan milidetik)
+                } catch(e) { console.error("Gagal membaca cache:", e); }
+            }
+            // Tetap ambil data terbaru untuk diam-diam memperbarui cache
+            fetchDataLatarBelakang();
         });
 
-        // Diperbarui: Fungsi Tombol Segarkan (Refresh) Manual
+        // 6. Fungsi Refresh Manual
         function refreshRiwayat() {
             const btnRefresh = document.getElementById("btn-refresh");
             const icon = btnRefresh.querySelector("i");
@@ -240,73 +276,27 @@
                 btnRefresh.disabled = false;
                 
                 if (data.status !== "gagal") {
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(data)); // Perbarui cache
-                    renderDataAplikasi(data);
+                    localStorage.setItem(CACHE_KEY_PUBLIKASI, JSON.stringify(data));
+                    renderDataPublikasi(data);
                 } else {
-                    renderRiwayat(riwayatCache); // Kembalikan ke riwayat sebelumnya jika gagal
+                    renderTabelRiwayat(riwayatCache); 
                     alert("Gagal memuat data: " + data.pesan);
                 }
             }).catch(err => {
                 icon.classList.remove("fa-spin");
                 btnRefresh.disabled = false;
-                renderRiwayat(riwayatCache);
+                renderTabelRiwayat(riwayatCache);
                 alert("Gagal terhubung ke server.");
             });
         }
 
-        function loadDatabase() {
-            const tbody = document.getElementById('historyBody');
-            tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat riwayat...</td></tr>';
-
-            fetch(SCRIPT_URL)
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "gagal") {
-                    alert("Error Database: " + data.pesan); return;
-                }
-
-                const dropdown = document.getElementById("namaDosen");
-                dropdown.innerHTML = '<option value="" disabled selected>-- Pilih Nama Dosen --</option>';
-                if(data.dosen) {
-                    data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
-                }
-
-                if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
-                    let html = '';
-                    data.riwayatPublikasi.slice(0, 15).forEach((item) => {
-                        let dateStr = new Date(item.timestamp).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year:'numeric'});
-                        html += `
-                            <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100">
-                                <td class="p-4 align-top">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <span class="text-[10px] font-bold text-slate-400">${dateStr}</span>
-                                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">${item.sebagaiPenulis}</span>
-                                    </div>
-                                    <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
-                                    <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel}</div>
-                                    <div class="text-[10px] text-slate-500 mt-1"><i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal} (Vol ${item.volume}, No ${item.nomor})</div>
-                                    <div class="mt-2">
-                                        <a href="${item.linkArtikel}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline"><i class="fas fa-external-link-alt"></i> Buka Artikel</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    tbody.innerHTML = html;
-                } else {
-                    tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada data publikasi terdaftar.</td></tr>';
-                }
-            }).catch(err => {
-                tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-red-400">Koneksi database gagal.</td></tr>';
-            });
-        }
-
+        // 7. Simpan Formulir ke Database
         function simpanPublikasi(e) {
             e.preventDefault();
             
             const btn = document.getElementById("btn-submit");
             const temp = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...`;
             btn.disabled = true;
 
             const formData = new URLSearchParams();
@@ -333,7 +323,10 @@
                 if (resData.status === "sukses") {
                     alert("Data publikasi berhasil disimpan!");
                     document.getElementById("formPublikasi").reset();
-                    loadDatabase(); 
+                    
+                    // Segarkan riwayat secara otomatis setelah berhasil Input
+                    document.getElementById('historyBody').innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin text-emerald-600 mr-2"></i>Memperbarui riwayat...</td></tr>';
+                    fetchDataLatarBelakang(); 
                 } else {
                     alert("Gagal menyimpan data: " + resData.pesan);
                 }
