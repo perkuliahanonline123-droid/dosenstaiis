@@ -742,13 +742,13 @@
 
             html2pdf().set(opt).from(clone).save().then(() => {
                 document.body.removeChild(wrapper);
-                btnCetak.innerHTML = `<i class="fas fa-file-pdf"></i> Cetak PDF`;
+                btnCetak.innerHTML = `<i class="fas fa-file-pdf"></i> Simpan PDF`;
                 btnCetak.disabled = false;
             }).catch(err => {
                 document.body.removeChild(wrapper);
-                btnCetak.innerHTML = `<i class="fas fa-file-pdf"></i> Cetak PDF`;
+                btnCetak.innerHTML = `<i class="fas fa-file-pdf"></i> Simpan PDF`;
                 btnCetak.disabled = false;
-                alert("Gagal mencetak PDF.");
+                alert("Gagal menyimpan PDF.");
             });
         }
     </script>
