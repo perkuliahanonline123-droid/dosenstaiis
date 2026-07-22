@@ -136,17 +136,26 @@
         </div>
 
         <!-- RIWAYAT UPLOAD -->
-        <div class="lg:col-span-5 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
-                <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Riwayat Publikasi</h2>
-                <button onclick="loadDatabase()" class="text-slate-400 hover:text-emerald-600 transition" title="Refresh">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-            <div id="historyTableContainer" class="overflow-y-auto max-h-[600px] custom-scrollbar">
+        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
+            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
+                        <button type="button" id="btn-refresh" onclick="refreshRiwayat()" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Riwayat">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <span class="text-[10px] text-slate-400 italic hidden md:inline">Klik untuk pratinjau</span>
+                </div>
+            </div> <!-- BATAS PERBAIKAN: Penutup header diletakkan di sini agar tabel di bawahnya full-width -->
+            <div id="historyTableContainer" class="overflow-y-auto max-h-[530px] custom-scrollbar bg-white">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
                     <tbody id="historyBody" class="divide-y divide-slate-100 bg-white">
-                        <tr><td class="p-5 text-center text-xs text-slate-500">Memuat riwayat publikasi...</td></tr>
+                        <tr>
+                            <td class="p-6 text-center text-xs text-slate-500">
+                                <i class="fas fa-spinner fa-spin text-slate-400 mr-2"></i>Memuat riwayat...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
