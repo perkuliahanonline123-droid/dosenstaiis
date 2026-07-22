@@ -44,7 +44,7 @@
     <header class="w-full bg-emerald-800 text-white px-6 md:px-10 py-10 rounded-b-[1.5rem] shadow-timbul relative z-10">
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full mx-auto">
             <div>
-                <span class="text-sm md:text-base font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 block">Dashboard Dosen</span>
+                <span class="text-sm md:text-base font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 block">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
                 <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-wide text-white">Pendataan Publikasi Ilmiah</h1>
                 <p class="text-emerald-100 text-base md:text-lg mt-2 max-w-2xl">Lengkapi data artikel jurnal ilmiah yang telah Anda publikasikan beserta riwayatnya.</p>
             </div>
@@ -102,7 +102,7 @@
         </div>
 
         <!-- FORMULIR INPUT -->
-        <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full">
+        <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full flex flex-xl flex-col">
             <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-6 border-b border-slate-200 pb-3"><i class="fas fa-edit mr-2"></i>Form Input Publikasi</h2>
             
             <form id="formPublikasi" onsubmit="simpanPublikasi(event)" class="space-y-5">
@@ -194,9 +194,9 @@
             </form>
         </div>
 
-        <!-- RIWAYAT UPLOAD -->
-        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200">
+        <!-- RIWAYAT UPLOAD (DISAMAKAN TINGGINYA DENGAN FORM KIRI) -->
+        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8 flex flex-col self-stretch">
+            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 shrink-0">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
@@ -207,7 +207,7 @@
                     <span class="text-[10px] text-slate-400 italic hidden md:inline">Klik untuk pratinjau</span>
                 </div>
             </div> 
-            <div id="historyTableContainer" class="overflow-y-auto max-h-[530px] custom-scrollbar bg-white">
+            <div id="historyTableContainer" class="overflow-y-auto flex-1 custom-scrollbar bg-white" style="max-height: calc(100vh - 280px);">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
                     <tbody id="historyBody" class="divide-y divide-slate-100 bg-white">
                         <tr>
@@ -259,7 +259,6 @@
         let riwayatCache = [];
         let namaDosenAktif = 'Dosen';
 
-        // FUNGSI UNTUK MENGHITUNG DAN MEMPERBARUI KARTU STATISTIK
         function updateStatistik(riwayatArray) {
             let total = riwayatArray.length;
             let scopus = 0;
@@ -297,10 +296,10 @@
             if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
                 riwayatCache = data.riwayatPublikasi;
                 renderTabelRiwayat(riwayatCache);
-                updateStatistik(riwayatCache); // Panggil fungsi statistik
+                updateStatistik(riwayatCache);
             } else {
                 tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada data publikasi terdaftar.</td></tr>';
-                updateStatistik([]); // Reset statistik jika kosong
+                updateStatistik([]);
             }
         }
 
