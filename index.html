@@ -152,17 +152,31 @@
             </div>
         </div>
 
+        <!-- ... [Kode Form Kiri Sebelumnya] ... -->
+
         <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
-                    <button type="button" id="btn-refresh" onclick="refreshRiwayat()" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Riwayat">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+            
+            <!-- HEADER SIDEBAR & PINTASAN -->
+            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200">
+                <!-- Baris Judul & Tombol Refresh -->
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Log & Riwayat Input</h2>
+                        <button type="button" id="btn-refresh" onclick="refreshRiwayat()" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Riwayat">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <span class="text-[10px] text-slate-400 italic hidden md:inline">Klik untuk pratinjau</span>
                 </div>
-                <span class="text-[10px] text-slate-400 italic hidden md:inline">Klik untuk pratinjau</span>
+                
+                <!-- Tombol Pintasan ke Publikasi -->
+                <a href="publikasi.html" class="flex items-center justify-center gap-2 w-full bg-white border-2 border-emerald-100 hover:border-emerald-500 hover:bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-all shadow-sm">
+                    <i class="fas fa-book"></i> Halaman Publikasi
+                </a>
             </div>
-            <div id="historyTableContainer" class="overflow-y-auto max-h-[600px] custom-scrollbar">
+
+            <!-- KONTAINER TABEL RIWAYAT -->
+            <div id="historyTableContainer" class="overflow-y-auto max-h-[530px] custom-scrollbar">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
                     <tbody id="historyBody" class="divide-y divide-slate-100 bg-white">
                         <tr><td class="p-5 text-center text-xs text-slate-500">Memuat riwayat...</td></tr>
@@ -170,8 +184,9 @@
                 </table>
             </div>
         </div>
-    </main>
 
+    </main>
+    <!-- ... [Modal dan Script di bawahnya tetap sama] ... -->
     <div id="preview-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm overflow-y-auto flex items-start justify-center pt-8 pb-10 px-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-[1100px] overflow-hidden flex flex-col mt-2">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
