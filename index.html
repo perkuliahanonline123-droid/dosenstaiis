@@ -274,10 +274,7 @@
 
             let html = '';
             riwayatList.forEach((item, index) => {
-                // Ambil daftar matkul dengan fallback nama kolom
                 const matkul = item.matkulList || item.Matkul || item['Mata Kuliah'] || item.kegiatan || '-';
-                
-                // Rapikan format tanggal (dari format ISO ke lokal)
                 let tglFormat = item.tanggal || '-';
                 if(item.tanggal && item.tanggal !== '-') {
                     try {
@@ -310,12 +307,10 @@
             const icon = btnRefresh.querySelector("i");
             const tbody = document.getElementById("historyBody");
 
-            // Animasi loading
             icon.classList.add("fa-spin");
             btnRefresh.disabled = true;
             tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat pembaruan...</td></tr>`;
 
-            // Panggil ulang database
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
@@ -326,7 +321,7 @@
                     riwayatCache = data.riwayat;
                     renderRiwayat(riwayatCache);
                 } else {
-                    renderRiwayat(riwayatCache); // Kembalikan ke riwayat lama jika gagal
+                    renderRiwayat(riwayatCache); 
                 }
             }).catch(err => {
                 icon.classList.remove("fa-spin");
@@ -498,6 +493,92 @@
             tbody.innerHTML = tableHtml;
         }
 
+        // ==========================================
+        // FUNGSI-FUNGSI YANG DITAMBAHKAN (PERBAIKAN)
+        // ==========================================
+
+        // Fungsi untuk menangkap data dari Form dan menampilkan Pratinjau
+        function siapkanLaporan() {
+            const namaDosen = document.getElementById("dosenDropdown").value;
+            const semester = document.getElementById("semester").value;
+
+            if (!namaDosen || !semester) {
+                alert("Mohon pilih Nama Dosen dan Semester terlebih dahulu!");
+                return;
+            }
+
+            // Kumpulkan matkul yang di checklist
+            const matkulCheckboxes = document.querySelectorAll('input[name="matakuliah"]:checked');
+            const matkulList = Array.from(matkulCheckboxes).map(cb => cb.value).join(', ');
+
+            if (!matkulList) {
+                alert("Mohon pilih minimal satu mata kuliah!");
+                return;
+            }
+
+            const st_dosen = document.getElementById("st_dosen").value;
+            const absen_nilai = document.getElementById("absen_nilai").value;
+
+            if (!st_dosen || !absen_nilai) {
+                alert("Link Surat Tugas Dosen serta Absen & Nilai wajib diisi!");
+                return;
+            }
+
+            // Menyusun objek data
+            const dataForm = {
+                namaDosen: namaDosen,
+                semester: semester,
+                matkulList: matkulList,
+                st_dosen: st_dosen,
+                absen_nilai: absen_nilai,
+                judul_penelitian: document.getElementById("judul_penelitian").value,
+                st_penelitian: document.getElementById("st_penelitian").value,
+                lap_penelitian: document.getElementById("lap_penelitian").value,
+                judul_pengabdian: document.getElementById("judul_pengabdian").value,
+                st_pengabdian: document.getElementById("st_pengabdian").value,
+                lap_pengabdian: document.getElementById("lap_pengabdian").value
+            };
+
+            // Pastikan identitas di PDF sudah termuat
+            loadDosenDetails();
+            
+            // Populasikan tabel PDF
+            generateTableContent(dataForm);
+
+            // Buka Modal Pratinjau
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        // Fungsi untuk menutup Modal
+        function tutupPratinjau() {
+            document.getElementById('preview-modal').classList.add('hidden');
+        }
+
+        // Fungsi untuk mencetak file PDF menggunakan html2pdf
+        function cetakPDF() {
+            const element = document.getElementById('pdf-template');
+            const namaDosen = document.getElementById("dosenDropdown").value || "Riwayat";
+            
+            const opt = {
+                margin:       0,
+                filename:     `Laporan_BKD_${namaDosen.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Ganti teks tombol selama pemrosesan (opsional untuk UX)
+            const btnCetak = document.getElementById('btn-cetak');
+            const originalText = btnCetak.innerHTML;
+            btnCetak.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            btnCetak.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btnCetak.innerHTML = originalText;
+                btnCetak.disabled = false;
+            });
+        }
+        
         function bukaPratinjauDariRiwayat(index) {
             let item = riwayatCache[index];
             if (!item) return;
