@@ -160,7 +160,90 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
 
-        document.addEventListener("DOMContentLoaded", loadDatabase);
+        const CACHE_KEY = 'data_lbkd_cache';
+
+        // Fungsi terpisah untuk memproses dan menampilkan data agar bisa dipanggil oleh Cache & Fetch
+        function renderDataAplikasi(data) {
+            allDosenData = data.detailDosen || {};
+            allSksData = data.sksData || {};
+
+            const dropdown = document.getElementById("dosenDropdown");
+            dropdown.innerHTML = '<option value="">-- Pilih Nama Dosen --</option>';
+            if(data.dosen) {
+                data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
+            }
+            
+            const mkContainer = document.getElementById("matkulCheckboxList");
+            mkContainer.innerHTML = '';
+            if(data.matkul) {
+                data.matkul.forEach(mk => {
+                    mkContainer.innerHTML += `
+                        <label class="flex items-start space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer">
+                            <input type="checkbox" name="matakuliah" value="${mk}" class="mt-0.5 w-4 h-4 text-emerald-600 border-slate-300 rounded accent-emerald-600 shrink-0">
+                            <span class="leading-tight">${mk}</span>
+                        </label>
+                    `;
+                });
+            }
+            
+            riwayatCache = data.riwayat || [];
+            renderRiwayat(riwayatCache);
+        }
+
+        // Dijalankan saat halaman pertama kali dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Cek Cache Lokal terlebih dahulu
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            if (cachedData) {
+                try {
+                    const parsedData = JSON.parse(cachedData);
+                    renderDataAplikasi(parsedData); // Tampilkan seketika dari cache
+                } catch(e) {
+                    console.error("Gagal membaca cache:", e);
+                }
+            }
+
+            // 2. Ambil data terbaru di latar belakang (Background Fetch)
+            fetch(SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status !== "gagal") {
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(data)); // Simpan ke cache
+                    renderDataAplikasi(data); // Perbarui tampilan dengan data terbaru
+                }
+            }).catch(err => console.log("Gagal sinkronisasi data latar belakang."));
+        });
+
+        // Diperbarui: Fungsi Tombol Segarkan (Refresh) Manual
+        function refreshRiwayat() {
+            const btnRefresh = document.getElementById("btn-refresh");
+            const icon = btnRefresh.querySelector("i");
+            const tbody = document.getElementById("historyBody");
+
+            icon.classList.add("fa-spin");
+            btnRefresh.disabled = true;
+            tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin text-emerald-600 mr-2"></i>Mengambil data terbaru...</td></tr>`;
+
+            fetch(SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                icon.classList.remove("fa-spin");
+                btnRefresh.disabled = false;
+                
+                if (data.status !== "gagal") {
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(data)); // Perbarui cache
+                    renderDataAplikasi(data);
+                } else {
+                    renderRiwayat(riwayatCache); // Kembalikan ke riwayat sebelumnya jika gagal
+                    alert("Gagal memuat data: " + data.pesan);
+                }
+            }).catch(err => {
+                icon.classList.remove("fa-spin");
+                btnRefresh.disabled = false;
+                renderRiwayat(riwayatCache);
+                alert("Gagal terhubung ke server.");
+            });
+        }
 
         function loadDatabase() {
             const tbody = document.getElementById('historyBody');
