@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- PUSTAKA UNTUK DIRECT DOWNLOAD PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -37,31 +40,7 @@
             box-sizing: border-box;
         }
 
-        /* Pengaturan Khusus Saat Dicetak (Print) */
-        @media print {
-            body * {
-                visibility: hidden; /* Sembunyikan semua elemen web */
-            }
-            #printArea, #printArea * {
-                visibility: visible; /* Tampilkan hanya area pratinjau */
-            }
-            #printArea {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-                background: white;
-            }
-            .a4-container { 
-                margin: 0; 
-                padding: 15mm; 
-                box-shadow: none; 
-                width: 100%; 
-                min-height: auto; 
-            }
-        }
+        /* Karena kita menggunakan html2pdf, kita tidak lagi mengandalkan @media print murni bawaan browser */
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
@@ -225,13 +204,14 @@
                 <h3 class="font-bold text-slate-700 text-sm tracking-wide uppercase"><i class="fas fa-search mr-2 text-slate-400"></i> Pratinjau Laporan Kinerja</h3>
                 <div class="flex items-center gap-3">
                     <button onclick="tutupModal()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition-colors uppercase">Tutup</button>
-                    <button onclick="cetakPDF()" class="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors uppercase flex items-center gap-2"><i class="fas fa-print"></i> Cetak PDF</button>
+                    <button id="btn-cetak" onclick="cetakPDF()" class="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors uppercase flex items-center gap-2"><i class="fas fa-download"></i> Simpan PDF</button>
                 </div>
             </div>
 
-            <!-- Modal Body (Area yang akan dicetak) -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-slate-200 custom-scrollbar" id="printArea">
-                <div class="a4-container">
+            <!-- Modal Body (Area yang akan didownload ke PDF) -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-slate-200 custom-scrollbar">
+                <!-- Tambahkan ID 'areaCetakPDF' di sini -->
+                <div id="areaCetakPDF" class="a4-container bg-white">
                     <!-- KOP SURAT -->
                     <div style="text-align: center; line-height: 1.1;">
                         <div style="font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
@@ -262,6 +242,7 @@
 
         const CACHE_KEY_PUBLIKASI = 'data_publikasi_cache';
         let riwayatCache = [];
+        let namaDosenAktif = 'Dosen'; // Variabel untuk menyimpan nama dosen untuk judul file PDF
 
         function renderDataPublikasi(data) {
             const dropdown = document.getElementById("namaDosen");
@@ -308,12 +289,19 @@
             tbody.innerHTML = html;
         }
 
-        // FUNGSI BARU: Membuka Modal Pratinjau
+        // FUNGSI: Membuka Modal Pratinjau
         function tampilkanPratinjau(index) {
             const data = riwayatCache[index];
             if (!data) return;
 
-            // Membuat tabel HTML untuk rincian data di kertas A4
+            // Simpan nama dosen untuk keperluan penamaan file PDF
+            if (data.namaDosen) {
+                // Mengubah spasi dan karakter unik menjadi underscore agar rapi untuk nama file
+                namaDosenAktif = data.namaDosen.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+            } else {
+                namaDosenAktif = 'Dosen';
+            }
+
             const detailHTML = `
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                     <tbody>
@@ -353,21 +341,45 @@
                 </table>
             `;
 
-            // Memasukkan tabel detail ke dalam pratinjau A4
             document.getElementById('kontenPratinjauDinamis').innerHTML = detailHTML;
-
-            // Menampilkan modal
             document.getElementById('modalPratinjau').classList.remove('hidden');
         }
 
-        // Fungsi Menutup Modal
         function tutupModal() {
             document.getElementById('modalPratinjau').classList.add('hidden');
         }
 
-        // Fungsi Cetak / Print PDF
+        // FUNGSI BARU: Direct Download ke PDF menggunakan html2pdf
         function cetakPDF() {
-            window.print();
+            // Targetkan elemen kertas A4 yang mau disimpan ke PDF
+            const element = document.getElementById('areaCetakPDF');
+            
+            // Ubah tombol untuk memberikan indikator loading kepada user
+            const btn = document.getElementById('btn-cetak');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            // Pengaturan untuk output PDF
+            const opt = {
+                margin:       0, // Margin ditangani oleh padding di CSS .a4-container
+                filename:     `Data_Publikasi_${namaDosenAktif}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Memproses PDF dan Mengunduhnya
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Mengembalikan tombol seperti semula setelah selesai
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error("Gagal membuat PDF: ", err);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert("Terjadi kesalahan saat memproses PDF.");
+            });
         }
 
         // Menutup modal jika area di luar kotak (backdrop) diklik
