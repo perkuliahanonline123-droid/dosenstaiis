@@ -137,23 +137,69 @@
             </div>
         </div>
 
-        <!-- Tambahkan kode ini tepat di atas elemen "DAFTAR MATA KULIAH" -->
-        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+        <style>
+            /* Pembungkus utama menggunakan Grid agar rapi di HP dan PC */
+            .kartu-rps-container {
+                display: grid;
+                /* Di PC akan berdampingan (2 kolom), di HP akan turun ke bawah jika layar < 200px */
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 16px;
+                margin-bottom: 24px;
+                width: 100%; /* Memastikan tidak menyusut di PC */
+            }
+        
+            /* Desain Kartu dengan Efek Timbul */
+            .kartu-rps {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                padding: 16px;
+                background-color: #ffffff;
+                border-radius: 10px;
+                text-decoration: none;
+                color: #1f2937;
+                font-family: system-ui, -apple-system, sans-serif;
+                font-weight: 600;
+                font-size: 14px;
+                
+                /* Efek Timbul (Soft Drop Shadow) */
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                border: 1px solid rgba(0,0,0, 0.02);
+                
+                /* Transisi halus saat di-hover */
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        
+            /* Efek saat kursor diarahkan ke kartu (Lebih Timbul) */
+            .kartu-rps:hover {
+                transform: translateY(-4px); /* Mengangkat kartu ke atas */
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Bayangan membesar */
+                color: #157347; /* Teks sedikit berubah warna senada dengan header hijau */
+            }
+        
+            .ikon-kartu {
+                font-size: 20px;
+            }
+        </style>
+        
+        <!-- Letakkan ini tepat di atas elemen "Daftar Mata Kuliah" -->
+        <div class="kartu-rps-container">
             
             <!-- Kartu 1: TEMPLATE -->
             <a href="https://docs.google.com/document/d/1skFjQf8rY-ywI4L_A5xfQXbl9Ntg7LIr/edit?usp=sharing&ouid=109961524026816441622&rtpof=true&sd=true" 
                target="_blank" 
-               style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #1f2937; font-weight: 600; font-size: 14px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: all 0.2s ease-in-out;">
-                <span style="font-size: 18px;">📄</span>
-                TEMPLATE
+               class="kartu-rps">
+                <span class="ikon-kartu">📄</span>
+                <span>TEMPLATE</span>
             </a>
         
             <!-- Kartu 2: CONTOH RPS -->
             <a href="https://drive.google.com/file/d/15gZwptY3biQkBreCPQKECRR5uMe1BrVm/view?usp=sharing" 
                target="_blank" 
-               style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #1f2937; font-weight: 600; font-size: 14px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: all 0.2s ease-in-out;">
-                <span style="font-size: 18px;">📁</span>
-                CONTOH RPS
+               class="kartu-rps">
+                <span class="ikon-kartu">📁</span>
+                <span>CONTOH RPS</span>
             </a>
         
         </div>
