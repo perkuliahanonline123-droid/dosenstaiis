@@ -72,7 +72,7 @@
     <!-- BOTTOM NAVIGATION BAR (Khusus HP) -->
     <nav class="fixed bottom-0 left-0 z-50 w-full h-[72px] bg-white border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden flex justify-around items-center text-[10px] font-bold tracking-widest uppercase pb-1">
         
-        <!-- Menu 1: LKD (Tidak Aktif) -->
+        <!-- Menu 1: LKD -->
         <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-emerald-600 transition-colors">
             <svg class="w-6 h-6 mb-1.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
@@ -80,7 +80,7 @@
             <span>LKD</span>
         </a>
     
-        <!-- Menu 2: PUBLIKASI (Tidak Aktif) -->
+        <!-- Menu 2: PUBLIKASI -->
         <a href="publikasi.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-emerald-600 transition-colors">
             <svg class="w-6 h-6 mb-1.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
@@ -88,7 +88,7 @@
             <span>Publikasi</span>
         </a>
     
-        <!-- Menu 3: RPS (Aktif -> Warna Hijau) -->
+        <!-- Menu 3: RPS (Aktif) -->
         <a href="rps.html" class="flex flex-col items-center justify-center w-full h-full text-emerald-600">
             <svg class="w-6 h-6 mb-1.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
@@ -169,19 +169,17 @@
                 </div>
             </div>
         </div>
+        
         <!-- KOLOM KANAN: DAFTAR MATA KULIAH & KARTU -->
         <div class="lg:col-span-4 flex flex-col gap-5 sticky top-8 self-start" style="max-height: calc(100vh - 150px);">
             
             <!-- KARTU TEMPLATE & CONTOH (Grid 2 Kolom agar sejajar di PC) -->
             <div class="grid grid-cols-2 gap-4 shrink-0">
-                <!-- Kartu 1: TEMPLATE -->
                 <a href="https://docs.google.com/document/d/1skFjQf8rY-ywI4L_A5xfQXbl9Ntg7LIr/edit?usp=sharing&ouid=109961524026816441622&rtpof=true&sd=true" 
                    target="_blank" 
                    class="flex items-center justify-center gap-2 p-4 bg-white rounded-xl shadow-timbul border border-slate-200 text-slate-700 font-semibold text-xs lg:text-sm hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(0,0,0,0.1)] hover:text-emerald-700 hover:border-emerald-200 transition-all duration-300">
                     <span class="text-lg">📄</span> TEMPLATE
                 </a>
-            
-                <!-- Kartu 2: CONTOH RPS -->
                 <a href="https://drive.google.com/file/d/15gZwptY3biQkBreCPQKECRR5uMe1BrVm/view?usp=sharing" 
                    target="_blank" 
                    class="flex items-center justify-center gap-2 p-4 bg-white rounded-xl shadow-timbul border border-slate-200 text-slate-700 font-semibold text-xs lg:text-sm hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(0,0,0,0.1)] hover:text-emerald-700 hover:border-emerald-200 transition-all duration-300">
@@ -192,13 +190,21 @@
             <!-- CONTAINER DAFTAR MATA KULIAH -->
             <div class="bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden flex flex-col flex-1">
                 <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 shrink-0">
-                    <div class="flex justify-between items-center">
+                    <!-- Judul & Refresh -->
+                    <div class="flex justify-between items-center mb-4">
                         <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none"><i class="fas fa-list mr-2 text-emerald-600"></i> Daftar Mata Kuliah</h2>
                         <button type="button" onclick="loadDropdown(true)" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Data (Hapus Cache)">
                             <i class="fas fa-sync-alt" id="refresh-icon"></i>
                         </button>
                     </div>
+                    
+                    <!-- Kotak Pencarian Baru -->
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" onkeyup="filterMataKuliah()" placeholder="Cari mata kuliah..." class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-slate-600">
+                    </div>
                 </div> 
+                
                 <div id="quickListContainer" class="overflow-y-auto flex-1 custom-scrollbar bg-white p-2">
                     <div id="quickListBody" class="flex flex-col gap-1">
                         <div class="p-4 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat daftar...</div>
@@ -240,7 +246,7 @@
         const welcomeMessage = document.getElementById('welcomeMessage');
         const quickListBody = document.getElementById('quickListBody');
         
-        let activeMKName = "Mata_Kuliah"; 
+        let activeMKName = null; // Menyimpan nama MK yang sedang aktif
         let mkCache = {};
     
         function bukaModal() { document.getElementById('modalPratinjau').classList.remove('hidden'); }
@@ -256,7 +262,7 @@
             const fileDownload = document.createElement("a");
             document.body.appendChild(fileDownload);
             fileDownload.href = source;
-            fileDownload.download = 'RPS_' + activeMKName + '.doc';
+            fileDownload.download = 'RPS_' + (activeMKName ? activeMKName.replace(/[^a-zA-Z0-9]/g, '_') : 'Dokumen') + '.doc';
             fileDownload.click();
             document.body.removeChild(fileDownload);
         }
@@ -297,22 +303,59 @@
                 let listHTML = '';
     
                 dataList.forEach(mk => {
-                    // PERBAIKAN: Menggunakan data-attribute (dataset) agar tanda kutip seperti pada "Qur'an" tidak merusak struktur HTML
                     const safeMK = mk.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    // Tambahan: class "mk-item" dan "border-l-4" untuk mengatur indikator menu aktif
                     listHTML += `
-                        <button onclick="pilihDariDaftar(this.dataset.mk)" data-mk="${safeMK}" class="text-left p-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors border-b border-slate-100 flex items-center justify-between group last:border-0 w-full">
+                        <button onclick="pilihDariDaftar(this, this.dataset.mk)" data-mk="${safeMK}" class="mk-item text-left p-4 text-sm font-semibold text-slate-700 hover:bg-emerald-50 transition-colors border-b border-slate-100 flex items-center justify-between group last:border-0 w-full border-l-4 border-transparent">
                             <span class="truncate pr-2">${mk}</span>
-                            <i class="fas fa-chevron-right text-[10px] text-slate-300 group-hover:text-emerald-500 transition-colors"></i>
+                            <i class="fas fa-chevron-right text-[10px] text-slate-300 transition-colors"></i>
                         </button>`;
                 });
     
                 quickListBody.innerHTML = listHTML;
+
+                // FITUR AUTO-LOAD: Buka otomatis mata kuliah pertama jika belum ada yang terbuka
+                if (!activeMKName) {
+                    const firstBtn = quickListBody.querySelector('.mk-item');
+                    if (firstBtn) firstBtn.click();
+                }
+
             } else {
                 quickListBody.innerHTML = '<div class="p-4 text-center text-xs text-red-500">Data mata kuliah kosong.</div>';
             }
         }
+
+        // FITUR PENCARIAN
+        function filterMataKuliah() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const items = document.querySelectorAll('.mk-item');
+
+            items.forEach(item => {
+                const mkName = item.dataset.mk.toLowerCase();
+                if (mkName.includes(filter)) {
+                    item.style.display = ""; // Tampilkan jika cocok
+                } else {
+                    item.style.display = "none"; // Sembunyikan jika tidak cocok
+                }
+            });
+        }
     
-        function pilihDariDaftar(mk) {
+        function pilihDariDaftar(element, mk) {
+            // Mengatur style menu yang aktif
+            document.querySelectorAll('.mk-item').forEach(el => {
+                el.classList.remove('bg-emerald-50', 'border-emerald-500', 'text-emerald-700');
+                el.classList.add('border-transparent');
+                const icon = el.querySelector('i');
+                if(icon) { icon.classList.remove('text-emerald-500'); icon.classList.add('text-slate-300'); }
+            });
+
+            // Beri warna hijau ke menu yang sedang di-klik
+            element.classList.remove('border-transparent');
+            element.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-700');
+            const activeIcon = element.querySelector('i');
+            if(activeIcon) { activeIcon.classList.remove('text-slate-300'); activeIcon.classList.add('text-emerald-500'); }
+
             fetchDetailMK(mk);
         }
     
@@ -323,7 +366,7 @@
                 return;
             }
             
-            activeMKName = selectedMK.replace(/[^a-zA-Z0-9]/g, '_');
+            activeMKName = selectedMK; // Set active MK
             welcomeMessage.classList.add('hidden');
             resultContainer.classList.add('hidden');
             loadingIndicator.classList.remove('hidden');
@@ -362,7 +405,6 @@
         };
     
         function tampilkanDetail(data) {
-            // PERBAIKAN: Menarik SEMUA data untuk ditampilkan di kolom kiri
             let namaMk = getValDinamis(data, ['matakuliah', 'namamk', 'mata_kuliah', 'nama_mata_kuliah']) || '-';
             let kodeMk = getValDinamis(data, ['kode', 'kodemk', 'kode_mk', 'kode_mata_kuliah']) || '-';
             let deskripsiMk = getValDinamis(data, ['deskripsimk', 'deskripsi', 'deskripsi_mk']) || '-';
@@ -411,7 +453,7 @@
             loadingIndicator.classList.add('hidden');
             resultContainer.classList.remove('hidden');
         }
-    
+        
         function buildWordHTML(data, validKodeMk) {
             // Pemetaan List khusus untuk CPL, CPMK, Sub-CPMK
             const mapList = (arr, keysKode, keysDeskripsi) => {
