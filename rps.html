@@ -235,13 +235,12 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyg_PSTOgxmDAx-5AOaKsMk8zzr2W8TW5X9T_zmgy7pHeyWeiigUPk5VRzkqlEc77Frgg/exec";
         
-        const selectElement = document.getElementById('mataKuliah');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const resultContainer = document.getElementById('resultContainer');
         const welcomeMessage = document.getElementById('welcomeMessage');
         const quickListBody = document.getElementById('quickListBody');
-        let activeMKName = "Mata_Kuliah"; 
         
+        let activeMKName = "Mata_Kuliah"; 
         let mkCache = {};
 
         function bukaModal() { document.getElementById('modalPratinjau').classList.remove('hidden'); }
