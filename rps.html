@@ -137,87 +137,43 @@
             </div>
         </div>
 
-        <style>
-            /* Pembungkus utama menggunakan Grid agar rapi di HP dan PC */
-            .kartu-rps-container {
-                display: grid;
-                /* Di PC akan berdampingan (2 kolom), di HP akan turun ke bawah jika layar < 200px */
-                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-                gap: 16px;
-                margin-bottom: 24px;
-                width: 100%; /* Memastikan tidak menyusut di PC */
-            }
-        
-            /* Desain Kartu dengan Efek Timbul */
-            .kartu-rps {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                padding: 16px;
-                background-color: #ffffff;
-                border-radius: 10px;
-                text-decoration: none;
-                color: #1f2937;
-                font-family: system-ui, -apple-system, sans-serif;
-                font-weight: 600;
-                font-size: 14px;
-                
-                /* Efek Timbul (Soft Drop Shadow) */
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                border: 1px solid rgba(0,0,0, 0.02);
-                
-                /* Transisi halus saat di-hover */
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-        
-            /* Efek saat kursor diarahkan ke kartu (Lebih Timbul) */
-            .kartu-rps:hover {
-                transform: translateY(-4px); /* Mengangkat kartu ke atas */
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Bayangan membesar */
-                color: #157347; /* Teks sedikit berubah warna senada dengan header hijau */
-            }
-        
-            .ikon-kartu {
-                font-size: 20px;
-            }
-        </style>
-        
-        <!-- Letakkan ini tepat di atas elemen "Daftar Mata Kuliah" -->
-        <div class="kartu-rps-container">
+        <!-- KOLOM KANAN: DAFTAR MATA KULIAH & KARTU -->
+        <div class="lg:col-span-4 flex flex-col gap-5 sticky top-8 self-start" style="max-height: calc(100vh - 150px);">
             
-            <!-- Kartu 1: TEMPLATE -->
-            <a href="https://docs.google.com/document/d/1skFjQf8rY-ywI4L_A5xfQXbl9Ntg7LIr/edit?usp=sharing&ouid=109961524026816441622&rtpof=true&sd=true" 
-               target="_blank" 
-               class="kartu-rps">
-                <span class="ikon-kartu">📄</span>
-                <span>TEMPLATE</span>
-            </a>
-        
-            <!-- Kartu 2: CONTOH RPS -->
-            <a href="https://drive.google.com/file/d/15gZwptY3biQkBreCPQKECRR5uMe1BrVm/view?usp=sharing" 
-               target="_blank" 
-               class="kartu-rps">
-                <span class="ikon-kartu">📁</span>
-                <span>CONTOH RPS</span>
-            </a>
-        
-        </div>
-        <!-- KOLOM KANAN: DAFTAR -->
-        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden sticky top-8 flex flex-col self-stretch" style="max-height: calc(100vh - 150px);">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 shrink-0">
-                <div class="flex justify-between items-center">
-                    <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none"><i class="fas fa-list mr-2 text-emerald-600"></i> Daftar Mata Kuliah</h2>
-                    <button type="button" onclick="loadDropdown(true)" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Data (Hapus Cache)">
-                        <i class="fas fa-sync-alt" id="refresh-icon"></i>
-                    </button>
-                </div>
-            </div> 
-            <div id="quickListContainer" class="overflow-y-auto flex-1 custom-scrollbar bg-white p-2">
-                <div id="quickListBody" class="flex flex-col gap-1">
-                    <div class="p-4 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat daftar...</div>
+            <!-- KARTU TEMPLATE & CONTOH (Grid 2 Kolom agar sejajar di PC) -->
+            <div class="grid grid-cols-2 gap-4 shrink-0">
+                <!-- Kartu 1: TEMPLATE -->
+                <a href="https://docs.google.com/document/d/1skFjQf8rY-ywI4L_A5xfQXbl9Ntg7LIr/edit?usp=sharing&ouid=109961524026816441622&rtpof=true&sd=true" 
+                   target="_blank" 
+                   class="flex items-center justify-center gap-2 p-4 bg-white rounded-xl shadow-timbul border border-slate-200 text-slate-700 font-semibold text-xs lg:text-sm hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(0,0,0,0.1)] hover:text-emerald-700 hover:border-emerald-200 transition-all duration-300">
+                    <span class="text-lg">📄</span> TEMPLATE
+                </a>
+            
+                <!-- Kartu 2: CONTOH RPS -->
+                <a href="https://drive.google.com/file/d/15gZwptY3biQkBreCPQKECRR5uMe1BrVm/view?usp=sharing" 
+                   target="_blank" 
+                   class="flex items-center justify-center gap-2 p-4 bg-white rounded-xl shadow-timbul border border-slate-200 text-slate-700 font-semibold text-xs lg:text-sm hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(0,0,0,0.1)] hover:text-emerald-700 hover:border-emerald-200 transition-all duration-300">
+                    <span class="text-lg">📁</span> CONTOH RPS
+                </a>
+            </div>
+
+            <!-- CONTAINER DAFTAR MATA KULIAH -->
+            <div class="bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden flex flex-col flex-1">
+                <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 shrink-0">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none"><i class="fas fa-list mr-2 text-emerald-600"></i> Daftar Mata Kuliah</h2>
+                        <button type="button" onclick="loadDropdown(true)" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Data (Hapus Cache)">
+                            <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                        </button>
+                    </div>
+                </div> 
+                <div id="quickListContainer" class="overflow-y-auto flex-1 custom-scrollbar bg-white p-2">
+                    <div id="quickListBody" class="flex flex-col gap-1">
+                        <div class="p-4 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat daftar...</div>
+                    </div>
                 </div>
             </div>
+            
         </div>
     </main>
 
