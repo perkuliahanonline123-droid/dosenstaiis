@@ -234,7 +234,7 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyg_PSTOgxmDAx-5AOaKsMk8zzr2W8TW5X9T_zmgy7pHeyWeiigUPk5VRzkqlEc77Frgg/exec";
-        
+    
         const loadingIndicator = document.getElementById('loadingIndicator');
         const resultContainer = document.getElementById('resultContainer');
         const welcomeMessage = document.getElementById('welcomeMessage');
@@ -242,7 +242,7 @@
         
         let activeMKName = "Mata_Kuliah"; 
         let mkCache = {};
-
+    
         function bukaModal() { document.getElementById('modalPratinjau').classList.remove('hidden'); }
         function tutupModal() { document.getElementById('modalPratinjau').classList.add('hidden'); }
         
@@ -260,7 +260,7 @@
             fileDownload.click();
             document.body.removeChild(fileDownload);
         }
-
+    
         async function loadDropdown(forceRefresh = false) {
             const refreshIcon = document.getElementById('refresh-icon');
             if(refreshIcon) refreshIcon.classList.add('fa-spin');
@@ -270,16 +270,14 @@
                 if(refreshIcon) refreshIcon.classList.remove('fa-spin');
                 return;
             }
-
-            selectElement.innerHTML = '<option value="">-- Memuat Data... --</option>';
-            selectElement.disabled = true;
+    
             quickListBody.innerHTML = '<div class="p-4 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat daftar dari server...</div>';
-
+    
             try {
                 const response = await fetch(`${API_URL}?action=getDropdown`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const json = await response.json();
-
+    
                 if (json.status === 'success') {
                     sessionStorage.setItem('mkList', JSON.stringify(json.data));
                     renderDropdown(json.data);
@@ -289,42 +287,33 @@
             } catch (error) {
                 console.error("Fetch Error:", error);
                 quickListBody.innerHTML = '<div class="p-4 text-center text-xs text-red-500">Koneksi ke server gagal.</div>';
-                selectElement.innerHTML = '<option value="">-- Koneksi Gagal --</option>';
             } finally {
                 if(refreshIcon) refreshIcon.classList.remove('fa-spin');
             }
         }
-
+    
         function renderDropdown(dataList) {
             if (dataList && dataList.length > 0) {
-                let optionsHTML = '<option value="">-- Pilih Mata Kuliah --</option>';
                 let listHTML = '';
-
+    
                 dataList.forEach(mk => {
-                    optionsHTML += `<option value="${mk}">${mk}</option>`;
                     listHTML += `
                         <button onclick="pilihDariDaftar('${mk}')" class="text-left p-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors border-b border-slate-100 flex items-center justify-between group last:border-0 w-full">
                             <span class="truncate pr-2">${mk}</span>
                             <i class="fas fa-chevron-right text-[10px] text-slate-300 group-hover:text-emerald-500 transition-colors"></i>
                         </button>`;
                 });
-
-                selectElement.innerHTML = optionsHTML;
+    
                 quickListBody.innerHTML = listHTML;
-                selectElement.disabled = false;
             } else {
                 quickListBody.innerHTML = '<div class="p-4 text-center text-xs text-red-500">Data mata kuliah kosong.</div>';
-                selectElement.innerHTML = '<option value="">-- Tidak ada data --</option>';
             }
         }
-
+    
         function pilihDariDaftar(mk) {
-            selectElement.value = mk;
             fetchDetailMK(mk);
         }
-
-        selectElement.addEventListener('change', (e) => fetchDetailMK(e.target.value));
-
+    
         async function fetchDetailMK(selectedMK) {
             if (!selectedMK) {
                 resultContainer.classList.add('hidden');
@@ -336,16 +325,16 @@
             welcomeMessage.classList.add('hidden');
             resultContainer.classList.add('hidden');
             loadingIndicator.classList.remove('hidden');
-
+    
             if (mkCache[selectedMK]) {
                 tampilkanDetail(mkCache[selectedMK]);
                 return;
             }
-
+    
             try {
                 const response = await fetch(`${API_URL}?action=getDetails&mk=${encodeURIComponent(selectedMK)}`);
                 const json = await response.json();
-
+    
                 if (json.status === 'success' && json.data) {
                     mkCache[selectedMK] = json.data;
                     tampilkanDetail(json.data);
@@ -357,7 +346,7 @@
                 loadingIndicator.innerHTML = '<p class="text-red-500">Koneksi terputus saat mengambil detail.</p>';
             }
         }
-
+    
         // Fungsi Global Pembacaan Key Dinamis (Mengatasi Perbedaan Penamaan Kolom/Key)
         const getValDinamis = (obj, targetKeys) => {
             if (!obj) return undefined;
@@ -369,13 +358,13 @@
             }
             return undefined;
         };
-
+    
         function tampilkanDetail(data) {
             // Mapping fleksibel untuk Nama MK dan Kode MK dari Sheet DATA KURIKULUM
             let namaMk = getValDinamis(data, ['matakuliah', 'namamk', 'mata_kuliah', 'nama_mata_kuliah']) || '-';
             let kodeMk = getValDinamis(data, ['kode', 'kodemk', 'kode_mk', 'kode_mata_kuliah']) || '-';
             let deskripsiMk = getValDinamis(data, ['deskripsimk', 'deskripsi', 'deskripsi_mk']) || '-';
-
+    
             document.getElementById('view-namamk').textContent = namaMk;
             document.getElementById('view-kodemk').textContent = kodeMk;
             document.getElementById('view-deskripsi').textContent = deskripsiMk;
@@ -385,270 +374,256 @@
             loadingIndicator.classList.add('hidden');
             resultContainer.classList.remove('hidden');
         }
-
-        function buildWordHTML(data, validKodeMk) {
-    // 1. Tambahkan fungsi getValDinamis agar kode tidak error dan loading terus-menerus
-    const getValDinamis = (obj, keys) => {
-        if (!obj) return null;
-        for (let key of keys) {
-            if (obj[key] !== undefined && obj[key] !== null && obj[key] !== '') {
-                return obj[key];
-            }
-        }
-        return null;
-    };
-
-    // 2. Pemetaan List khusus untuk CPL, CPMK, Sub-CPMK
-    const mapList = (arr, keysKode, keysDeskripsi) => {
-        if (!arr || arr.length === 0) return `<tr><td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 15%; border-right: 1px solid black;">-</td><td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">-</td></tr>`;
-        
-        return arr.map(item => {
-            // Coba mencari berdasarkan Key Target, jika gagal ambil kolom index 0 dan 1.
-            let kode = getValDinamis(item, keysKode) || item[Object.keys(item)[0]] || '-';
-            let deskripsi = getValDinamis(item, keysDeskripsi) || item[Object.keys(item)[1]] || '-';
-            
-            return `
-            <tr>
-                <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 15%; border-right: 1px solid black; vertical-align: top;">${kode}</td>
-                <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; vertical-align: top; text-align: justify;">${deskripsi}</td>
-            </tr>
-            `;
-        }).join('');
-    };
-
-    // 3. Menarik Data Sesuai Header pada Sheet "DATA KURIKULUM"
-    // Gunakan array data['Nama Header'] untuk menangkap nama header yang menggunakan spasi
-    let kodeMKValue = data['Kode MK'] || data.kode_mk || data.Kode_MK || validKodeMk || '-';
-    let mataKuliahValue = data['Mata Kuliah'] || data.mata_kuliah || '-';
-    let sksValue = data['SKS'] || data.sks || '2';
-    let semesterValue = data['Semester'] || data.semester || '4';
-    let dosenPengampuValue = data['Nama Dosen Pengampu'] || data.dosen_pengampu || '-';
-    let kaprodiValue = data['Kaprodi'] || data.kaprodi || '-';
     
-    let bahanKajianTeks = data.bahan_kajian ? String(data.bahan_kajian).replace(/(?:\r\n|\r|\n)+/g, '<br>') : '-';
-
-    // 4. Membangun HTML Word
-    let htmlDoc = `
-        <div style="font-family: 'Times New Roman', Times, serif; color: #000; font-size: 10pt; line-height: 1.3;">
-            
-            <!-- TABEL 1: INFORMASI UMUM & IDENTITAS -->
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid black; margin-bottom: 20px;">
-                <tr>
-                    <td style="border: 1px solid black; text-align: center; padding: 10px;" colspan="6">
-                        <div style="font-size: 14pt; font-weight: bold;">STAI IMAM SYAFI'I CIANJUR</div>
-                        <div style="font-size: 12pt; font-weight: bold; margin: 4px 0;">HUKUM KELUARGA ISLAM</div>
-                        <div style="font-size: 9pt;">Jl. Sarongge No. 16 RT.01/RW. 04 Desa Ciputri Kec. Pacet Kab. Cianjur - Jawa Barat 43253. Email: <a href="mailto:admin@stai-imamsyafii.ac.id" style="color: blue;">admin@stai-imamsyafii.ac.id</a>.</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6" style="border: 1px solid black; text-align: center; font-weight: bold; background-color: #d9d9d9; padding: 5px; font-size: 11pt;">
-                        RENCANA PEMBELAJARAN SEMESTER
-                    </td>
-                </tr>
+        function buildWordHTML(data, validKodeMk) {
+            // Pemetaan List khusus untuk CPL, CPMK, Sub-CPMK
+            const mapList = (arr, keysKode, keysDeskripsi) => {
+                if (!arr || arr.length === 0) return `<tr><td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 15%; border-right: 1px solid black;">-</td><td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">-</td></tr>`;
                 
-                <!-- IDENTITAS MK -->
-                <tr style="text-align: center; font-weight: bold; background-color: #f2f2f2;">
-                    <td style="border: 1px solid black; padding: 5px; width: 25%;">Mata kuliah (MK)</td>
-                    <td style="border: 1px solid black; padding: 5px; width: 15%;">Kode</td>
-                    <td style="border: 1px solid black; padding: 5px; width: 20%;">Rumpun MK</td>
-                    <td style="border: 1px solid black; padding: 5px; width: 15%;">Bobot (sks)</td>
-                    <td style="border: 1px solid black; padding: 5px; width: 10%;">Semester</td>
-                    <td style="border: 1px solid black; padding: 5px; width: 15%;">Tanggal Penyusunan</td>
-                </tr>
-                <tr style="text-align: center;">
-                    <td style="border: 1px solid black; padding: 5px;">${mataKuliahValue}</td>
-                    <td style="border: 1px solid black; padding: 5px;">${kodeMKValue}</td>
-                    <td style="border: 1px solid black; padding: 5px;">Rumpun Ilmu Sosial</td>
-                    <td style="border: 1px solid black; padding: 2px;">Teori: ${sksValue} sks<br>Praktik: 0 sks<br>Jumlah: ${sksValue} sks</td>
-                    <td style="border: 1px solid black; padding: 5px;">${semesterValue}</td>
-                    <td style="border: 1px solid black; padding: 5px;">${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</td>
-                </tr>
-
-                <!-- OTORISASI -->
-                <tr>
-                    <td style="border: 1px solid black; padding: 5px; width: 25%; vertical-align: middle; background-color: #f2f2f2; text-align: center; font-weight: bold;">
-                        Otorisasi<br>Ketua Program Studi
-                    </td>
-                    <td colspan="5" style="border: 1px solid black; padding: 0; vertical-align: top;">
-                        <table style="width: 100%; border-collapse: collapse; text-align: center; font-weight: bold; height: 100%;">
-                            <tr style="background-color: #f2f2f2;">
-                                <td style="border-right: 1px solid black; border-bottom: 1px solid black; width: 33.33%; padding: 5px;">Pengembang RPS</td>
-                                <td style="border-right: 1px solid black; border-bottom: 1px solid black; width: 33.33%; padding: 5px;">Koordinator RMK</td>
-                                <td style="border-bottom: 1px solid black; width: 33.33%; padding: 5px;">Ketua Program Studi</td>
-                            </tr>
-                            <tr style="background-color: #ffffff;">
-                                <td style="border-right: 1px solid black; padding: 15px 5px;">${dosenPengampuValue}</td>
-                                <td style="border-right: 1px solid black; padding: 15px 5px;">Abdul Wahid, M.H.</td>
-                                <td style="padding: 15px 5px;">${kaprodiValue}</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-
-                        <!-- CAPAIAN PEMBELAJARAN (CP) -->
+                return arr.map(item => {
+                    // Coba mencari berdasarkan Key Target, jika gagal ambil kolom index 0 dan 1.
+                    let kode = getValDinamis(item, keysKode) || item[Object.keys(item)[0]] || '-';
+                    let deskripsi = getValDinamis(item, keysDeskripsi) || item[Object.keys(item)[1]] || '-';
+                    
+                    return `
+                    <tr>
+                        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 15%; border-right: 1px solid black; vertical-align: top;">${kode}</td>
+                        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; vertical-align: top; text-align: justify;">${deskripsi}</td>
+                    </tr>
+                    `;
+                }).join('');
+            };
+    
+            // Menarik Data Sesuai Header pada Sheet "DATA KURIKULUM"
+            let kodeMKValue = data['Kode MK'] || data.kode_mk || data.Kode_MK || validKodeMk || '-';
+            let mataKuliahValue = data['Mata Kuliah'] || data.mata_kuliah || '-';
+            let sksValue = data['SKS'] || data.sks || '2';
+            let semesterValue = data['Semester'] || data.semester || '4';
+            let dosenPengampuValue = data['Nama Dosen Pengampu'] || data.dosen_pengampu || '-';
+            let kaprodiValue = data['Kaprodi'] || data.kaprodi || '-';
+            
+            let bahanKajianTeks = data.bahan_kajian ? String(data.bahan_kajian).replace(/(?:\r\n|\r|\n)+/g, '<br>') : '-';
+    
+            // Membangun HTML Word
+            let htmlDoc = `
+                <div style="font-family: 'Times New Roman', Times, serif; color: #000; font-size: 10pt; line-height: 1.3;">
+                    
+                    <!-- TABEL 1: INFORMASI UMUM & IDENTITAS -->
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid black; margin-bottom: 20px;">
                         <tr>
-                            <td style="border: 1px solid black; padding: 5px; vertical-align: top;">
-                                <b>Capaian Pembelajaran (CP)</b><br>
-                                - Sikap (S)<br>
-                                - Pengetahuan (P)<br>
-                                - Keterampilan Umum (KU)<br>
-                                - Keterampilan Khusus (KK)
-                            </td>
-                            <td colspan="5" style="border: 1px solid black; padding: 0; vertical-align: top;">
-                                <table style="width: 100%; border-collapse: collapse; border: none;">
-                                    <tr><td colspan="2" style="background-color: #d9d9d9; padding: 3px 5px; font-weight: bold; border-bottom: 1px solid black;">CPL-PRODI (Capaian Pembelajaran Lulusan Program Studi) yang Dibebankan pada Mata Kuliah</td></tr>
-                                    
-                                    ${data.cpl ? mapList(data.cpl, ['cpl', 'kodecpl', 'CPL'], ['deskripsicpl', 'deskripsi', 'Deskripsi CPL']) : `<tr><td colspan="2" style="padding: 3px 5px;">-</td></tr>`}
-
-                                    <tr><td colspan="2" style="background-color: #d9d9d9; padding: 3px 5px; font-weight: bold; border-top: 1px solid black; border-bottom: 1px solid black;">CPMK (Capaian Pembelajaran Mata Kuliah)</td></tr>
-                                    
-                                    ${data.cpmk ? mapList(data.cpmk, ['kodecpmk', 'cpmk'], ['deskripsicpmk', 'deskripsi']) : `<tr><td colspan="2" style="padding: 3px 5px;">-</td></tr>`}
-
-                                    <tr><td colspan="2" style="background-color: #d9d9d9; padding: 3px 5px; font-weight: bold; border-top: 1px solid black; border-bottom: 1px solid black;">Kemampuan Akhir Tiap Tahapan Belajar (Sub-CPMK)</td></tr>
-                                    
-                                    ${data.sub_cpmk ? mapList(data.sub_cpmk, ['kodesubcpmk', 'subcpmk', 'kodesub'], ['deskripsisubcpmk', 'deskripsisub', 'deskripsi']) : `<tr><td colspan="2" style="padding: 3px 5px;">-</td></tr>`}
-                                </table>
+                            <td style="border: 1px solid black; text-align: center; padding: 10px;" colspan="6">
+                                <div style="font-size: 14pt; font-weight: bold;">STAI IMAM SYAFI'I CIANJUR</div>
+                                <div style="font-size: 12pt; font-weight: bold; margin: 4px 0;">HUKUM KELUARGA ISLAM</div>
+                                <div style="font-size: 9pt;">Jl. Sarongge No. 16 RT.01/RW. 04 Desa Ciputri Kec. Pacet Kab. Cianjur - Jawa Barat 43253. Email: <a href="mailto:admin@stai-imamsyafii.ac.id" style="color: blue;">admin@stai-imamsyafii.ac.id</a>.</div>
                             </td>
                         </tr>
-                        <!-- DESKRIPSI MK -->
                         <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Deskripsi Singkat MK</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">${data.deskripsi_mk || '-'}</td>
-                        </tr>
-
-                        <!-- INTEGRASI KEILMUAN -->
-                        <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Integrasi Keilmuan</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">${data.integrasi_keilmuan || '-'}</td>
-                        </tr>
-
-                        <!-- INTEGRASI PENELITIAN -->
-                        <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Integrasi Penelitian dan/atau pengabdian Masyarakat</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">
-                                <b>Integrasi Penelitian</b><br>
-                                ${data.integrasi_penelitian || '-'}<br><br>
-                                <b>Integrasi Pengabdian pada Masyarakat</b><br>
-                                ${data.integrasi_pengabdian || '-'}
-                            </td>
-                        </tr>
-
-                        <!-- BAHAN KAJIAN -->
-                        <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Bahan Kajian/ Materi Pembelajaran</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">${bahanKajianTeks}</td>
-                        </tr>
-
-                        <!-- REFERENSI -->
-                        <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Daftar Referensi</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">
-                                <b>Utama:</b><br>
-                                ${data.referensi_utama || '-'}<br>
-                                <b>Pendukung:</b><br>
-                                ${data.referensi_pendukung || '-'}
-                            </td>
-                        </tr>
-
-                        <!-- METODE PEMBELAJARAN -->
-                        <tr>
-                            <td style="border: 1px solid black; font-weight: bold; padding: 5px; vertical-align: top;">Metode Pembelajaran</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">
-                                <ol class="list-decimal" style="list-style-type: decimal; margin-top: 0; margin-bottom: 0; padding-left: 20px;">
-                                    <li style="margin-bottom: 4px;">Pada pertemuan awal dilakukan Need Assessment untuk “kontrak belajar” menyepakati beberapa aturan yang harus ditaati selama perkuliahan;</li>
-                                    <li style="margin-bottom: 4px;">Untuk pengenalan konsep baru dilakukan dengan metode:
-                                        <ol type="a" class="list-[lower-alpha]" style="list-style-type: lower-alpha; margin-top: 4px; margin-bottom: 4px; padding-left: 20px;">
-                                            <li>Brain Storming, untuk konsep yang diperkirakan tidak asing bagi mahasiswa</li>
-                                            <li>Interactive Lecturing, untuk konsep yang sama sekali baru</li>
-                                            <li>Concept map, untuk pemetaan konsep-konsep utama yang menjadi bagian dari materi perkuliahan.</li>
-                                        </ol>
-                                    </li>
-                                    <li style="margin-bottom: 4px;">Untuk pendalaman materi dilakukan dengan metode:
-                                        <ol type="a" class="list-[lower-alpha]" style="list-style-type: lower-alpha; margin-top: 4px; margin-bottom: 4px; padding-left: 20px;">
-                                            <li>Forum-group discussion</li>
-                                            <li>Information Search</li>
-                                            <li>Guided reading/writing</li>
-                                            <li>Group resume</li>
-                                            <li>Presentation</li>
-                                            <li>Critical incident</li>
-                                        </ol>
-                                    </li>
-                                    <li style="margin-bottom: 4px;">Untuk pengembangan dan aplikasi teori dilakukan kajian dan analisis kasus-kasus hukum yang terjadi di masyarakat, terutama yang berkaitan dengan problem praksis adat dan kebiasaan.</li>
-                                    <li>Untuk penerapan metode-metode perkuliahan tersebut perlu dilakukan secara affirmative action, yaitu memberi perhatian secara khusus dengan memberi dorongan kepada mahasiswa yang kurang/tidak aktif untuk secara bersama-sama terlibat aktif dalam setiap proses perkuliahan. Tindakan ini dilakukan semata-mata untuk mencapai proses perkuliahan yang berkesetaraan gender. Oleh karena itu perlu dihindari terjadinya hal-hal yang bias gender, baik berupa tindakan, pilihan penggunaan bahasa, penataan ruang dan perhatian kepada mahasiswa secara adil.</li>
-                                </ol>
+                            <td colspan="6" style="border: 1px solid black; text-align: center; font-weight: bold; background-color: #d9d9d9; padding: 5px; font-size: 11pt;">
+                                RENCANA PEMBELAJARAN SEMESTER
                             </td>
                         </tr>
                         
-                        <!-- MEDIA PEMBELAJARAN -->
-                        <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Media Pembelajaran</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">Whiteboard, Ballpoint, Markers, LCD Projector, Slide, dan Notebook</td>
+                        <!-- IDENTITAS MK -->
+                        <tr style="text-align: center; font-weight: bold; background-color: #f2f2f2;">
+                            <td style="border: 1px solid black; padding: 5px; width: 25%;">Mata kuliah (MK)</td>
+                            <td style="border: 1px solid black; padding: 5px; width: 15%;">Kode</td>
+                            <td style="border: 1px solid black; padding: 5px; width: 20%;">Rumpun MK</td>
+                            <td style="border: 1px solid black; padding: 5px; width: 15%;">Bobot (sks)</td>
+                            <td style="border: 1px solid black; padding: 5px; width: 10%;">Semester</td>
+                            <td style="border: 1px solid black; padding: 5px; width: 15%;">Tanggal Penyusunan</td>
                         </tr>
-                        <!-- DOSEN PENGAMPU -->
-                        <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Dosen Pengampu</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">${data.dosen_pengampu || '-'}</td>
+                        <tr style="text-align: center;">
+                            <td style="border: 1px solid black; padding: 5px;">${mataKuliahValue}</td>
+                            <td style="border: 1px solid black; padding: 5px;">${kodeMKValue}</td>
+                            <td style="border: 1px solid black; padding: 5px;">Rumpun Ilmu Sosial</td>
+                            <td style="border: 1px solid black; padding: 2px;">Teori: ${sksValue} sks<br>Praktik: 0 sks<br>Jumlah: ${sksValue} sks</td>
+                            <td style="border: 1px solid black; padding: 5px;">${semesterValue}</td>
+                            <td style="border: 1px solid black; padding: 5px;">${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</td>
                         </tr>
-
-                        <!-- MATA KULIAH SYARAT -->
+    
+                        <!-- OTORISASI -->
                         <tr>
-                            <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Mata Kuliah Syarat</td>
-                            <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">${data.mk_syarat || '-'}</td>
+                            <td style="border: 1px solid black; padding: 5px; width: 25%; vertical-align: middle; background-color: #f2f2f2; text-align: center; font-weight: bold;">
+                                Otorisasi<br>Ketua Program Studi
+                            </td>
+                            <td colspan="5" style="border: 1px solid black; padding: 0; vertical-align: top;">
+                                <table style="width: 100%; border-collapse: collapse; text-align: center; font-weight: bold; height: 100%;">
+                                    <tr style="background-color: #f2f2f2;">
+                                        <td style="border-right: 1px solid black; border-bottom: 1px solid black; width: 33.33%; padding: 5px;">Pengembang RPS</td>
+                                        <td style="border-right: 1px solid black; border-bottom: 1px solid black; width: 33.33%; padding: 5px;">Koordinator RMK</td>
+                                        <td style="border-bottom: 1px solid black; width: 33.33%; padding: 5px;">Ketua Program Studi</td>
+                                    </tr>
+                                    <tr style="background-color: #ffffff;">
+                                        <td style="border-right: 1px solid black; padding: 15px 5px;">${dosenPengampuValue}</td>
+                                        <td style="border-right: 1px solid black; padding: 15px 5px;">Abdul Wahid, M.H.</td>
+                                        <td style="padding: 15px 5px;">${kaprodiValue}</td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
-                    </table>
-                    
-                    <br>
-
-                    <!-- TABEL 2: RINCIAN KEGIATAN PERKULIAHAN -->
-                    <table style="width: 100%; border-collapse: collapse; border: 1px solid black; text-align: left;">
-                        <thead>
-                            <tr>
-                                <th colspan="8" style="padding: 5px; border: 1px solid black; background-color: #d9d9d9; text-align: center; font-size: 12pt; font-weight: bold;">
-                                    RINCIAN KEGIATAN PERKULIAHAN
-                                </th>
-                            </tr>
-                            <tr style="background-color: #f2f2f2; text-align: center; vertical-align: middle;">
-                                <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 4%;">Mg ke-</th>
-                                <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 20%;">Kemampuan Akhir yang Diharapkan (Sub-CPMK)</th>
-                                <th colspan="2" style="padding: 5px; border: 1px solid black;">Penilaian</th>
-                                <th colspan="2" style="padding: 5px; border: 1px solid black;">Bentuk Pembelajaran, Metode Pembelajaran, Penugasan Mahasiswa<br><span style="color:blue;">[Estimasi Waktu]</span></th>
-                                <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 15%;">Materi Pembelajaran<br><span style="color:blue;">[Pustaka]</span></th>
-                                <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 5%;">Bobot Penilaian (%)</th>
-                            </tr>
-                            <tr style="background-color: #f2f2f2; text-align: center; vertical-align: middle;">
-                                <th style="padding: 5px; border: 1px solid black;">Indikator</th>
-                                <th style="padding: 5px; border: 1px solid black;">Kriteria & Teknik</th>
-                                <th style="padding: 5px; border: 1px solid black;">Luring</th>
-                                <th style="padding: 5px; border: 1px solid black;">Daring</th>
-                            </tr>
-                            <tr style="background-color: #f2f2f2; text-align: center; font-weight: normal;">
-                                <th style="padding: 2px; border: 1px solid black;">(1)</th>
-                                <th style="padding: 2px; border: 1px solid black;">(2)</th>
-                                <th style="padding: 2px; border: 1px solid black;">(3)</th>
-                                <th style="padding: 2px; border: 1px solid black;">(4)</th>
-                                <th style="padding: 2px; border: 1px solid black;">(5)</th>
-                                <th style="padding: 2px; border: 1px solid black;">(6)</th>
-                                <th style="padding: 2px; border: 1px solid black;">(7)</th>
-                                <th style="padding: 2px; border: 1px solid black;">(8)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="8" style="padding: 15px; border: 1px solid black; text-align: center; color: #666;">
-                                    <i>Data rincian pertemuan belum tersedia di sistem.</i>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
+    
+                                <!-- CAPAIAN PEMBELAJARAN (CP) -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; vertical-align: top;">
+                                        <b>Capaian Pembelajaran (CP)</b><br>
+                                        - Sikap (S)<br>
+                                        - Pengetahuan (P)<br>
+                                        - Keterampilan Umum (KU)<br>
+                                        - Keterampilan Khusus (KK)
+                                    </td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 0; vertical-align: top;">
+                                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                                            <tr><td colspan="2" style="background-color: #d9d9d9; padding: 3px 5px; font-weight: bold; border-bottom: 1px solid black;">CPL-PRODI (Capaian Pembelajaran Lulusan Program Studi) yang Dibebankan pada Mata Kuliah</td></tr>
+                                            
+                                            ${data.cpl ? mapList(data.cpl, ['cpl', 'kodecpl', 'CPL'], ['deskripsicpl', 'deskripsi', 'Deskripsi CPL']) : `<tr><td colspan="2" style="padding: 3px 5px;">-</td></tr>`}
+    
+                                            <tr><td colspan="2" style="background-color: #d9d9d9; padding: 3px 5px; font-weight: bold; border-top: 1px solid black; border-bottom: 1px solid black;">CPMK (Capaian Pembelajaran Mata Kuliah)</td></tr>
+                                            
+                                            ${data.cpmk ? mapList(data.cpmk, ['kodecpmk', 'cpmk'], ['deskripsicpmk', 'deskripsi']) : `<tr><td colspan="2" style="padding: 3px 5px;">-</td></tr>`}
+    
+                                            <tr><td colspan="2" style="background-color: #d9d9d9; padding: 3px 5px; font-weight: bold; border-top: 1px solid black; border-bottom: 1px solid black;">Kemampuan Akhir Tiap Tahapan Belajar (Sub-CPMK)</td></tr>
+                                            
+                                            ${data.sub_cpmk ? mapList(data.sub_cpmk, ['kodesubcpmk', 'subcpmk', 'kodesub'], ['deskripsisubcpmk', 'deskripsisub', 'deskripsi']) : `<tr><td colspan="2" style="padding: 3px 5px;">-</td></tr>`}
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- DESKRIPSI MK -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Deskripsi Singkat MK</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">${data.deskripsi_mk || '-'}</td>
+                                </tr>
+    
+                                <!-- INTEGRASI KEILMUAN -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Integrasi Keilmuan</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">${data.integrasi_keilmuan || '-'}</td>
+                                </tr>
+    
+                                <!-- INTEGRASI PENELITIAN -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Integrasi Penelitian dan/atau pengabdian Masyarakat</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">
+                                        <b>Integrasi Penelitian</b><br>
+                                        ${data.integrasi_penelitian || '-'}<br><br>
+                                        <b>Integrasi Pengabdian pada Masyarakat</b><br>
+                                        ${data.integrasi_pengabdian || '-'}
+                                    </td>
+                                </tr>
+    
+                                <!-- BAHAN KAJIAN -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Bahan Kajian/ Materi Pembelajaran</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">${bahanKajianTeks}</td>
+                                </tr>
+    
+                                <!-- REFERENSI -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Daftar Referensi</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">
+                                        <b>Utama:</b><br>
+                                        ${data.referensi_utama || '-'}<br>
+                                        <b>Pendukung:</b><br>
+                                        ${data.referensi_pendukung || '-'}
+                                    </td>
+                                </tr>
+    
+                                <!-- METODE PEMBELAJARAN -->
+                                <tr>
+                                    <td style="border: 1px solid black; font-weight: bold; padding: 5px; vertical-align: top;">Metode Pembelajaran</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; text-align: justify; vertical-align: top;">
+                                        <ol class="list-decimal" style="list-style-type: decimal; margin-top: 0; margin-bottom: 0; padding-left: 20px;">
+                                            <li style="margin-bottom: 4px;">Pada pertemuan awal dilakukan Need Assessment untuk “kontrak belajar” menyepakati beberapa aturan yang harus ditaati selama perkuliahan;</li>
+                                            <li style="margin-bottom: 4px;">Untuk pengenalan konsep baru dilakukan dengan metode:
+                                                <ol type="a" class="list-[lower-alpha]" style="list-style-type: lower-alpha; margin-top: 4px; margin-bottom: 4px; padding-left: 20px;">
+                                                    <li>Brain Storming, untuk konsep yang diperkirakan tidak asing bagi mahasiswa</li>
+                                                    <li>Interactive Lecturing, untuk konsep yang sama sekali baru</li>
+                                                    <li>Concept map, untuk pemetaan konsep-konsep utama yang menjadi bagian dari materi perkuliahan.</li>
+                                                </ol>
+                                            </li>
+                                            <li style="margin-bottom: 4px;">Untuk pendalaman materi dilakukan dengan metode:
+                                                <ol type="a" class="list-[lower-alpha]" style="list-style-type: lower-alpha; margin-top: 4px; margin-bottom: 4px; padding-left: 20px;">
+                                                    <li>Forum-group discussion</li>
+                                                    <li>Information Search</li>
+                                                    <li>Guided reading/writing</li>
+                                                    <li>Group resume</li>
+                                                    <li>Presentation</li>
+                                                    <li>Critical incident</li>
+                                                </ol>
+                                            </li>
+                                            <li style="margin-bottom: 4px;">Untuk pengembangan dan aplikasi teori dilakukan kajian dan analisis kasus-kasus hukum yang terjadi di masyarakat, terutama yang berkaitan dengan problem praksis adat dan kebiasaan.</li>
+                                            <li>Untuk penerapan metode-metode perkuliahan tersebut perlu dilakukan secara affirmative action, yaitu memberi perhatian secara khusus dengan memberi dorongan kepada mahasiswa yang kurang/tidak aktif untuk secara bersama-sama terlibat aktif dalam setiap proses perkuliahan. Tindakan ini dilakukan semata-mata untuk mencapai proses perkuliahan yang berkesetaraan gender. Oleh karena itu perlu dihindari terjadinya hal-hal yang bias gender, baik berupa tindakan, pilihan penggunaan bahasa, penataan ruang dan perhatian kepada mahasiswa secara adil.</li>
+                                        </ol>
+                                    </td>
+                                </tr>
+                                
+                                <!-- MEDIA PEMBELAJARAN -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Media Pembelajaran</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">Whiteboard, Ballpoint, Markers, LCD Projector, Slide, dan Notebook</td>
+                                </tr>
+                                <!-- DOSEN PENGAMPU -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Dosen Pengampu</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">${data.dosen_pengampu || '-'}</td>
+                                </tr>
+    
+                                <!-- MATA KULIAH SYARAT -->
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px; font-weight: bold; vertical-align: top;">Mata Kuliah Syarat</td>
+                                    <td colspan="5" style="border: 1px solid black; padding: 5px; vertical-align: top;">${data.mk_syarat || '-'}</td>
+                                </tr>
+                        </table>
+                        
+                        <br>
+    
+                        <!-- TABEL 2: RINCIAN KEGIATAN PERKULIAHAN -->
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid black; text-align: left;">
+                            <thead>
+                                <tr>
+                                    <th colspan="8" style="padding: 5px; border: 1px solid black; background-color: #d9d9d9; text-align: center; font-size: 12pt; font-weight: bold;">
+                                        RINCIAN KEGIATAN PERKULIAHAN
+                                    </th>
+                                </tr>
+                                <tr style="background-color: #f2f2f2; text-align: center; vertical-align: middle;">
+                                    <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 4%;">Mg ke-</th>
+                                    <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 20%;">Kemampuan Akhir yang Diharapkan (Sub-CPMK)</th>
+                                    <th colspan="2" style="padding: 5px; border: 1px solid black;">Penilaian</th>
+                                    <th colspan="2" style="padding: 5px; border: 1px solid black;">Bentuk Pembelajaran, Metode Pembelajaran, Penugasan Mahasiswa<br><span style="color:blue;">[Estimasi Waktu]</span></th>
+                                    <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 15%;">Materi Pembelajaran<br><span style="color:blue;">[Pustaka]</span></th>
+                                    <th rowspan="2" style="padding: 5px; border: 1px solid black; width: 5%;">Bobot Penilaian (%)</th>
+                                </tr>
+                                <tr style="background-color: #f2f2f2; text-align: center; vertical-align: middle;">
+                                    <th style="padding: 5px; border: 1px solid black;">Indikator</th>
+                                    <th style="padding: 5px; border: 1px solid black;">Kriteria & Teknik</th>
+                                    <th style="padding: 5px; border: 1px solid black;">Luring</th>
+                                    <th style="padding: 5px; border: 1px solid black;">Daring</th>
+                                </tr>
+                                <tr style="background-color: #f2f2f2; text-align: center; font-weight: normal;">
+                                    <th style="padding: 2px; border: 1px solid black;">(1)</th>
+                                    <th style="padding: 2px; border: 1px solid black;">(2)</th>
+                                    <th style="padding: 2px; border: 1px solid black;">(3)</th>
+                                    <th style="padding: 2px; border: 1px solid black;">(4)</th>
+                                    <th style="padding: 2px; border: 1px solid black;">(5)</th>
+                                    <th style="padding: 2px; border: 1px solid black;">(6)</th>
+                                    <th style="padding: 2px; border: 1px solid black;">(7)</th>
+                                    <th style="padding: 2px; border: 1px solid black;">(8)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="padding: 15px; border: 1px solid black; text-align: center; color: #666;">
+                                        <i>Data rincian pertemuan belum tersedia di sistem.</i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
             document.getElementById('kontenPratinjauDinamis').innerHTML = htmlDoc;
         }
-
+    
         // Panggil fungsi secara otomatis ketika halaman dimuat
         document.addEventListener('DOMContentLoaded', () => {
             loadDropdown();
         });
     </script>
-</body>
-</html>
