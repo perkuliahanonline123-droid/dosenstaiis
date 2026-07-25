@@ -136,15 +136,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">CPL</h3>
-                            <div id="view-cpl" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap">-</div>
+                            <div id="view-cpl" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap h-full break-words">-</div>
                         </div>
                         <div>
                             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">CPMK</h3>
-                            <div id="view-cpmk" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap">-</div>
+                            <div id="view-cpmk" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap h-full break-words">-</div>
                         </div>
                         <div>
                             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Sub-CPMK</h3>
-                            <div id="view-subcpmk" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap">-</div>
+                            <div id="view-subcpmk" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap h-full break-words">-</div>
                         </div>
                     </div>
 
@@ -297,8 +297,10 @@
                 let listHTML = '';
     
                 dataList.forEach(mk => {
+                    // PERBAIKAN: Menggunakan data-attribute (dataset) agar tanda kutip seperti pada "Qur'an" tidak merusak struktur HTML
+                    const safeMK = mk.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                     listHTML += `
-                        <button onclick="pilihDariDaftar('${mk}')" class="text-left p-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors border-b border-slate-100 flex items-center justify-between group last:border-0 w-full">
+                        <button onclick="pilihDariDaftar(this.dataset.mk)" data-mk="${safeMK}" class="text-left p-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors border-b border-slate-100 flex items-center justify-between group last:border-0 w-full">
                             <span class="truncate pr-2">${mk}</span>
                             <i class="fas fa-chevron-right text-[10px] text-slate-300 group-hover:text-emerald-500 transition-colors"></i>
                         </button>`;
@@ -360,17 +362,52 @@
         };
     
         function tampilkanDetail(data) {
-            // Mapping fleksibel untuk Nama MK dan Kode MK dari Sheet DATA KURIKULUM
+            // PERBAIKAN: Menarik SEMUA data untuk ditampilkan di kolom kiri
             let namaMk = getValDinamis(data, ['matakuliah', 'namamk', 'mata_kuliah', 'nama_mata_kuliah']) || '-';
             let kodeMk = getValDinamis(data, ['kode', 'kodemk', 'kode_mk', 'kode_mata_kuliah']) || '-';
             let deskripsiMk = getValDinamis(data, ['deskripsimk', 'deskripsi', 'deskripsi_mk']) || '-';
+            let dosenPengampu = getValDinamis(data, ['dosen_pengampu', 'dosenpengampu']) || '-';
+            let integrasi = getValDinamis(data, ['integrasi_keilmuan', 'integrasi']) || '-';
+            let bahanKajian = getValDinamis(data, ['bahan_kajian', 'bahankajian']) || '-';
     
+            // Memasukkan teks dasar
             document.getElementById('view-namamk').textContent = namaMk;
             document.getElementById('view-kodemk').textContent = kodeMk;
-            document.getElementById('view-deskripsi').textContent = deskripsiMk;
+            document.getElementById('view-dosen').textContent = dosenPengampu;
             
+            // Memasukkan teks panjang (konversi enter menjadi <br>)
+            const formatText = (text) => String(text).replace(/(?:\r\n|\r|\n)+/g, '<br>');
+            document.getElementById('view-deskripsi').innerHTML = formatText(deskripsiMk);
+            document.getElementById('view-integrasi').innerHTML = formatText(integrasi);
+            document.getElementById('view-materi').innerHTML = formatText(bahanKajian);
+
+            // Helper untuk CPL, CPMK, dan Sub-CPMK ke tampilan HTML Kiri
+            const formatListUntukView = (arr, keysKode, keysDeskripsi) => {
+                if (!arr || arr.length === 0) return '-';
+                return arr.map(item => {
+                    let kode = getValDinamis(item, keysKode) || item[Object.keys(item)[0]] || '-';
+                    let deskripsi = getValDinamis(item, keysDeskripsi) || item[Object.keys(item)[1]] || '-';
+                    return `<div class="mb-3"><span class="font-bold text-slate-800">${kode}</span><br>${deskripsi}</div>`;
+                }).join('');
+            };
+
+            // Memasukkan list ke dalam elemen CPL, CPMK, Sub-CPMK
+            document.getElementById('view-cpl').innerHTML = Array.isArray(data.cpl) 
+                ? formatListUntukView(data.cpl, ['kode_cpl', 'kodecpl'], ['deskripsi_cpl', 'deskripsi']) 
+                : (data.cpl || '-');
+                
+            document.getElementById('view-cpmk').innerHTML = Array.isArray(data.cpmk) 
+                ? formatListUntukView(data.cpmk, ['kode_cpmk', 'kodecpmk'], ['deskripsi_cpmk', 'deskripsi']) 
+                : (data.cpmk || '-');
+                
+            document.getElementById('view-subcpmk').innerHTML = Array.isArray(data.sub_cpmk) 
+                ? formatListUntukView(data.sub_cpmk, ['kode_subcpmk', 'kodesubcpmk'], ['deskripsi_subcpmk', 'deskripsi']) 
+                : (data.sub_cpmk || '-');
+            
+            // Build ke Word Modal
             buildWordHTML(data, kodeMk); 
             
+            // Sembunyikan Loading, Tampilkan Hasil
             loadingIndicator.classList.add('hidden');
             resultContainer.classList.remove('hidden');
         }
