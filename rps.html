@@ -101,13 +101,6 @@
         
         <!-- KOLOM KIRI: TAMPILAN DETAIL -->
         <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full flex flex-col">
-            <div class="mb-8">
-                <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Pilih Mata Kuliah <span class="text-emerald-600">*</span></label>
-                <select id="mataKuliah" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none transition-colors">
-                    <option value="">-- Menghubungkan ke Database... --</option>
-                </select>
-            </div>
-
             <div id="loadingIndicator" class="hidden text-center py-10 text-slate-500">
                 <i class="fas fa-spinner fa-spin text-emerald-600 text-3xl mb-3"></i>
                 <p class="text-sm font-bold tracking-wide uppercase">Mengambil data dari server...</p>
@@ -115,28 +108,67 @@
 
             <div id="welcomeMessage" class="text-center py-12 text-slate-400">
                 <i class="fas fa-book-open text-5xl mb-4 opacity-50"></i>
-                <p class="text-sm font-medium">Pilih mata kuliah pada menu di atas atau di daftar samping untuk melihat detail RPS.</p>
+                <p class="text-sm font-medium">Pilih mata kuliah pada daftar di samping untuk melihat detail RPS.</p>
             </div>
 
             <div id="resultContainer" class="hidden animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-slate-200 pb-4">
+                <!-- Header: Nama MK, Kode, dan Tombol -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 border-b border-slate-200 pb-4">
                     <div>
                         <h2 id="view-namamk" class="text-2xl font-black text-slate-800">Nama Mata Kuliah</h2>
                         <p id="view-kodemk" class="text-sm font-bold text-emerald-600 tracking-wider">KODE MK</p>
                     </div>
                     <button onclick="bukaModal()" class="text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-lg text-xs uppercase px-5 py-2.5 flex items-center gap-2 shadow-sm transition-colors whitespace-nowrap shrink-0">
-                        <i class="fas fa-eye"></i> Pratinjau & Unduh Dokumen
+                        <i class="fas fa-eye"></i> Pratinjau & Unduh
                     </button>
                 </div>
+
+                <!-- Konten Detail Mata Kuliah -->
                 <div class="space-y-6">
+                    
+                    <!-- Dosen Pengampu -->
                     <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Deskripsi Mata Kuliah</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Dosen Pengampu</h3>
+                        <div id="view-dosen" class="text-sm font-semibold text-slate-800">-</div>
+                    </div>
+
+                    <!-- CPL, SPMK, Sub-CPMK (Dibuat sejajar ke samping dengan Grid) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">CPL</h3>
+                            <div id="view-cpl" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap">-</div>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">SPMK</h3>
+                            <div id="view-spmk" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap">-</div>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Sub-CPMK</h3>
+                            <div id="view-subcpmk" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Deskripsi Singkat MK -->
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Deskripsi Singkat MK</h3>
                         <div id="view-deskripsi" class="text-sm text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-200 whitespace-pre-wrap leading-relaxed">-</div>
                     </div>
+
+                    <!-- Integrasi Keilmuan -->
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Integrasi Keilmuan</h3>
+                        <div id="view-integrasi" class="text-sm text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-200 whitespace-pre-wrap leading-relaxed">-</div>
+                    </div>
+
+                    <!-- Bahan Kajian / Materi Pembelajaran -->
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Bahan Kajian / Materi Pembelajaran</h3>
+                        <div id="view-materi" class="text-sm text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-200 whitespace-pre-wrap leading-relaxed">-</div>
+                    </div>
+
                 </div>
             </div>
         </div>
-
         <!-- KOLOM KANAN: DAFTAR MATA KULIAH & KARTU -->
         <div class="lg:col-span-4 flex flex-col gap-5 sticky top-8 self-start" style="max-height: calc(100vh - 150px);">
             
