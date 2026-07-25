@@ -253,19 +253,53 @@
         function tutupModal() { document.getElementById('modalPratinjau').classList.add('hidden'); }
         
         function cetakWord() {
-            const content = document.getElementById('areaCetakWord').innerHTML;
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>RPS</title></head><body>";
-            const footer = "</body></html>";
-            const sourceHTML = header + content + footer;
-            
-            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-            const fileDownload = document.createElement("a");
-            document.body.appendChild(fileDownload);
-            fileDownload.href = source;
-            fileDownload.download = 'RPS_' + (activeMKName ? activeMKName.replace(/[^a-zA-Z0-9]/g, '_') : 'Dokumen') + '.doc';
-            fileDownload.click();
-            document.body.removeChild(fileDownload);
-        }
+        const content = document.getElementById('areaCetakWord').innerHTML;
+        
+        // PERBAIKAN: Menambahkan CSS khusus Microsoft Word (@page) untuk memaksa orientasi Landscape
+        const header = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+              xmlns:w='urn:schemas-microsoft-com:office:word' 
+              xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+            <meta charset='utf-8'>
+            <title>RPS</title>
+            <style>
+                /* Konfigurasi Halaman Khusus MS Word */
+                @page Section1 {
+                    size: 841.9pt 595.3pt; /* Ukuran A4 Landscape dalam satuan point (29.7cm x 21cm) */
+                    mso-page-orientation: landscape;
+                    margin: 2cm 2cm 2cm 2cm;
+                    mso-header-margin: 35.4pt;
+                    mso-footer-margin: 35.4pt;
+                    mso-paper-source: 0;
+                }
+                div.Section1 {
+                    page: Section1;
+                }
+                
+                /* Memastikan tabel Word tidak melewati batas margin */
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    mso-table-layout-alt: fixed;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="Section1">
+        `;
+        
+        const footer = "</div></body></html>";
+        const sourceHTML = header + content + footer;
+        
+        const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+        const fileDownload = document.createElement("a");
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'RPS_' + (activeMKName ? activeMKName.replace(/[^a-zA-Z0-9]/g, '_') : 'Dokumen') + '.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+    }
     
         async function loadDropdown(forceRefresh = false) {
             const refreshIcon = document.getElementById('refresh-icon');
