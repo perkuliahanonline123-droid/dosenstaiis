@@ -116,11 +116,7 @@
                     </div>
                     <div>
                         <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Semester <span class="text-emerald-600">*</span></label>
-                        <select id="semester" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
-                            <option value="" disabled selected>Pilih Semester...</option>
-                            <option value="Ganjil">Ganjil</option>
-                            <option value="Genap">Genap</option>
-                        </select>
+                        <input type="text" id="semester" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none" placeholder="Contoh: Semester Ganjil 2024/2025">
                     </div>
                 </div>
 
@@ -257,8 +253,8 @@
                         <div style="margin-top: 6px; margin-bottom: 1px; border-bottom: 2.5px solid black;"></div>
                         <div style="margin-bottom: 8px; border-bottom: 1px solid black;"></div>
 
-                        <h2 style="font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 8px; text-transform: uppercase;">LAPORAN BEBAN KINERJA DOSEN</h2>
-
+                        <h2 style="font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 2px; text-transform: uppercase;">LAPORAN BEBAN KINERJA DOSEN</h2>
+                        <div id="pdf-semester" style="font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 8px; text-transform: uppercase;"></div>
                         <div style="font-weight: bold; font-size: 12px; margin-bottom: 3px;">I. IDENTITAS</div>
                         <div id="pdf-identitas" style="display: grid; grid-template-columns: 200px 15px 1fr; gap: 1px; font-size: 11px; margin-bottom: 6px; line-height: 1.2;">
                         </div>
@@ -657,7 +653,7 @@
                 <div>Jabatan Akademik</div><div>:</div><div>${d.jabatanAkademik || '-'}</div>
             `;
             document.getElementById('pdf-identitas').innerHTML = html;
-
+            document.getElementById('pdf-semester').innerText = item.semester || '-';
             generateTableContent(item);
 
             document.getElementById('preview-modal').classList.remove('hidden');
@@ -700,7 +696,7 @@
             };
 
             localFormCache[nama] = dataPaket;
-
+            document.getElementById('pdf-semester').innerText = smt;
             generateTableContent(dataPaket);
 
             const formData = new URLSearchParams();
