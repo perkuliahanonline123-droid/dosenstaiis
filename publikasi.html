@@ -346,14 +346,26 @@
             const tbody = document.getElementById('historyBody');
             if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
                 riwayatCache = data.riwayatPublikasi;
-                renderTabelRiwayat(riwayatCache);
+                
+                // 1. Perbarui angka di kartu statistik (tetap menghitung total semua data)
                 updateStatistik(riwayatCache);
+
+                // 2. Baca parameter 'filter' dari URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const filterParam = urlParams.get('filter');
+
+                // 3. Terapkan filter jika ada parameter yang cocok, jika tidak tampilkan semua
+                if (filterParam && ['scopus', 'sinta', 'lainnya', 'all'].includes(filterParam.toLowerCase())) {
+                    filterRiwayat(filterParam.toLowerCase());
+                } else {
+                    renderTabelRiwayat(riwayatCache); 
+                }
+
             } else {
                 tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada data publikasi terdaftar.</td></tr>';
                 updateStatistik([]);
             }
         }
-
         function renderTabelRiwayat(riwayatArray) {
             const tbody = document.getElementById('historyBody');
             let html = '';
