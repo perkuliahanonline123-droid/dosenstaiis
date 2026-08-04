@@ -105,7 +105,7 @@
         <!-- WIDGET STATISTIK PUBLIKASI -->
         <div class="lg:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
             <!-- Total -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+            <div onclick="filterRiwayat('all')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Tampilkan Semua">
                 <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex justify-center items-center text-xl shrink-0">
                     <i class="fas fa-book"></i>
                 </div>
@@ -115,7 +115,7 @@
                 </div>
             </div>
             <!-- Scopus -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+            <div onclick="filterRiwayat('scopus')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Filter Scopus/WoS">
                 <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex justify-center items-center text-xl shrink-0">
                     <i class="fas fa-globe"></i>
                 </div>
@@ -125,7 +125,7 @@
                 </div>
             </div>
             <!-- Sinta -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+            <div onclick="filterRiwayat('sinta')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Filter Jurnal Sinta">
                 <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex justify-center items-center text-xl shrink-0">
                     <i class="fas fa-certificate"></i>
                 </div>
@@ -135,7 +135,7 @@
                 </div>
             </div>
             <!-- Lainnya -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+            <div onclick="filterRiwayat('lainnya')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Filter Lainnya">
                 <div class="w-12 h-12 rounded-lg bg-slate-100 text-slate-500 flex justify-center items-center text-xl shrink-0">
                     <i class="fas fa-file-alt"></i>
                 </div>
@@ -145,7 +145,6 @@
                 </div>
             </div>
         </div>
-
         <!-- FORMULIR INPUT -->
         <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full flex flex-xl flex-col">
             <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-6 border-b border-slate-200 pb-3"><i class="fas fa-edit mr-2"></i>Form Input Publikasi</h2>
@@ -351,10 +350,12 @@
         function renderTabelRiwayat(riwayatArray) {
             const tbody = document.getElementById('historyBody');
             let html = '';
-            riwayatArray.slice(0, 15).forEach((item, index) => {
+            riwayatArray.slice(0, 15).forEach((item) => {
                 let dateStr = new Date(item.timestamp).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year:'numeric'});
+                
+                // Gunakan riwayatCache.indexOf(item) alih-alih index dari loop agar pratinjau tidak meleset saat difilter
                 html += `
-                    <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100 cursor-pointer" onclick="tampilkanPratinjau(${index})">
+                    <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100 cursor-pointer" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
                         <td class="p-4 align-top">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="text-[10px] font-bold text-slate-400">${dateStr}</span>
@@ -373,7 +374,6 @@
             });
             tbody.innerHTML = html;
         }
-
         function tampilkanPratinjau(index) {
             const data = riwayatCache[index];
             if (!data) return;
@@ -401,6 +401,35 @@
 
             document.getElementById('kontenPratinjauDinamis').innerHTML = detailHTML;
             document.getElementById('modalPratinjau').classList.remove('hidden');
+        }
+        function filterRiwayat(kategori) {
+            let filteredData = [];
+            
+            if (kategori === 'all') {
+                filteredData = riwayatCache;
+            } else if (kategori === 'scopus') {
+                filteredData = riwayatCache.filter(item => {
+                    let indeks = (item.indeksasi || '').toLowerCase();
+                    return indeks.includes('scopus') || indeks.includes('wos');
+                });
+            } else if (kategori === 'sinta') {
+                filteredData = riwayatCache.filter(item => {
+                    let indeks = (item.indeksasi || '').toLowerCase();
+                    return indeks.includes('sinta');
+                });
+            } else if (kategori === 'lainnya') {
+                filteredData = riwayatCache.filter(item => {
+                    let indeks = (item.indeksasi || '').toLowerCase();
+                    return !indeks.includes('scopus') && !indeks.includes('wos') && !indeks.includes('sinta');
+                });
+            }
+
+            // Render tabel jika ada data, tampilkan pesan kosong jika tidak ada
+            if(filteredData.length === 0) {
+                document.getElementById('historyBody').innerHTML = `<tr><td class="p-8 text-center text-xs text-slate-400 italic">Tidak ada publikasi yang sesuai untuk kategori ini.</td></tr>`;
+            } else {
+                renderTabelRiwayat(filteredData);
+            }
         }
 
         function tutupModal() {
