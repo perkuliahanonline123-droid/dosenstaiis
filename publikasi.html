@@ -379,11 +379,6 @@
             riwayatArray.slice(0, 15).forEach((item) => {
                 
                 let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '-';
-                
-                // Cek status akreditasi untuk memberikan highlight warna jika "Belum Terakreditasi"
-                let statusIndeksasi = item.indeksasi || 'Nasional Belum Terakreditasi';
-                    );
-                }
         
                 html += `
                     <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
@@ -392,17 +387,17 @@
                             <!-- KARTU PUBLIKASI -->
                             <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-2">
                                 
-                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS (Menyatu di kiri) -->
-                                <div class="flex items-center gap-2 flex-wrap">
+                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS -->
+                                <div class="flex justify-between items-center gap-4">
                                     <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
                                         ${item.namaDosen || '-'}
                                     </span>
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
+                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
                                         <i class="fas fa-feather-alt text-[#b48633]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
                                     </span>
                                 </div>
                                 
-                                <!-- BARIS 2: JUDUL ARTIKEL (Dominan & Tebal) -->
+                                <!-- BARIS 2: JUDUL ARTIKEL -->
                                 <h3 class="text-lg font-extrabold text-[#0f172a] leading-tight">
                                     ${item.judulArtikel || '-'}
                                 </h3>
@@ -426,10 +421,10 @@
                                             </span>
                                         </div>
                                         
-                                        <!-- Baris Akreditasi / Indeksasi -->
-                                        <div class="flex items-center gap-1.5 text-slate-700">
+                                        <!-- Baris Akreditasi / Indeksasi (Polos tanpa style khusus) -->
+                                        <div class="flex items-center gap-1.5 text-slate-600 font-medium">
                                             <i class="fas fa-shield-alt text-slate-400"></i> 
-                                            <span>${statusIndeksasi}</span>
+                                            <span>${item.indeksasi || 'Nasional Belum Terakreditasi'}</span>
                                         </div>
                                         
                                     </div>
