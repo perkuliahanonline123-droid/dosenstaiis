@@ -380,59 +380,68 @@
                 
                 let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '-';
                 
+                // Cek status akreditasi untuk memberikan highlight warna jika "Belum Terakreditasi"
+                let statusIndeksasi = item.indeksasi || 'Nasional Belum Terakreditasi';
+                if (statusIndeksasi.includes('Belum Terakreditasi')) {
+                    statusIndeksasi = statusIndeksasi.replace(
+                        'Belum Terakreditasi', 
+                        '<span class="text-[#b48633] font-bold">Belum Terakreditasi</span>'
+                    );
+                }
+        
                 html += `
                     <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
-                        <td class="p-3 align-top border-none">
+                        <td class="p-2 border-none">
                             
                             <!-- KARTU PUBLIKASI -->
-                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-1">
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-2">
                                 
-                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS -->
-                                <div class="flex justify-between items-center gap-4 mb-0.5">
-                                    <span class="text-[13px] font-medium text-slate-800 uppercase tracking-wide">
+                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS (Menyatu di kiri) -->
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
                                         ${item.namaDosen || '-'}
                                     </span>
-                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
                                         <i class="fas fa-feather-alt text-[#b48633]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
                                     </span>
                                 </div>
                                 
-                                <!-- BARIS 2: JUDUL ARTIKEL -->
-                                <h3 class="text-[16px] font-bold text-[#1e293b] leading-snug mb-1.5 pr-2">
+                                <!-- BARIS 2: JUDUL ARTIKEL (Dominan & Tebal) -->
+                                <h3 class="text-lg font-extrabold text-[#0f172a] leading-tight">
                                     ${item.judulArtikel || '-'}
                                 </h3>
                                 
-                                <!-- BARIS 3: INFO META & TOMBOL -->
-                                <div class="flex flex-wrap justify-between items-end gap-3 mt-0.5">
+                                <!-- BARIS 3: INFO META & TOMBOL CTA -->
+                                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-1">
                                     
-                                    <!-- Kolom Kiri: Jurnal & Indeksasi (Bertingkat) -->
-                                    <div class="flex flex-col gap-1.5">
+                                    <!-- Kolom Kiri: Detail Jurnal, Volume, Tahun & Akreditasi -->
+                                    <div class="flex flex-col gap-1.5 text-xs font-medium text-slate-600">
                                         
-                                        <!-- Jurnal, Vol, Tahun (Satu Baris) -->
-                                        <div class="flex flex-wrap items-center gap-3 text-[13px] text-slate-700 font-medium">
+                                        <!-- Baris Detail Jurnal, Vol, & Tahun -->
+                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
                                             <span class="flex items-center gap-1.5">
-                                                <i class="fas fa-book text-slate-500"></i> ${item.namaJurnal || '-'}
+                                                <i class="fas fa-book text-slate-400"></i> ${item.namaJurnal || '-'}
                                             </span>
                                             <span class="flex items-center gap-1.5">
-                                                <i class="fas fa-book-open text-slate-500"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
+                                                <i class="fas fa-book-open text-slate-400"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
                                             </span>
                                             <span class="flex items-center gap-1.5">
-                                                <i class="far fa-calendar text-slate-500"></i> ${tahunPublikasi}
+                                                <i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}
                                             </span>
                                         </div>
                                         
-                                        <!-- Indeksasi (Satu Baris di Bawahnya - Tanpa warna khusus/bold) -->
-                                        <div class="flex items-center gap-1.5 text-[13px] text-slate-700 font-medium">
-                                            <i class="fas fa-shield-check text-slate-500"></i> 
-                                            <span>${item.indeksasi || '-'}</span>
+                                        <!-- Baris Akreditasi / Indeksasi -->
+                                        <div class="flex items-center gap-1.5 text-slate-700">
+                                            <i class="fas fa-shield-alt text-slate-400"></i> 
+                                            <span>${statusIndeksasi}</span>
                                         </div>
                                         
                                     </div>
                                     
                                     <!-- Kolom Kanan: Tombol Buka Artikel -->
-                                    <div class="shrink-0 mt-2 sm:mt-0">
-                                        <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 bg-[#3b71ca] hover:bg-blue-700 text-white text-[12px] font-semibold px-4 py-2 rounded-md transition-colors shadow-sm">
-                                            BUKA ARTIKEL <i class="fas fa-external-link-square-alt"></i>
+                                    <div class="shrink-0">
+                                        <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center justify-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors shadow-sm tracking-wider uppercase w-full sm:w-auto">
+                                            BUKA ARTIKEL <i class="fas fa-external-link-alt text-[11px]"></i>
                                         </a>
                                     </div>
                                     
