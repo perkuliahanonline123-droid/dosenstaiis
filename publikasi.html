@@ -148,16 +148,14 @@
 
         <!-- RIWAYAT PUBLIKASI (DIBUAT LEBIH LEBAR: lg:col-span-8) -->
         <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden flex flex-col h-full">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 shrink-0">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <h2 class="font-bold text-sm tracking-widest text-slate-700 uppercase leading-none">Riwayat Publikasi</h2>
-                        <button type="button" id="btn-refresh" onclick="refreshRiwayat()" class="text-slate-400 hover:text-emerald-600 transition outline-none" title="Segarkan Riwayat">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <span class="text-[10px] text-slate-400 italic hidden md:inline">Klik untuk pratinjau</span>
+            <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 shrink-0">
+                <div class="flex items-center gap-2">
+                    <h2 class="font-bold text-base text-slate-800 uppercase tracking-wide leading-none">Riwayat Publikasi</h2>
+                    <button type="button" id="btn-refresh" onclick="refreshRiwayat()" class="text-slate-400 hover:text-[#3b71ca] transition outline-none" title="Segarkan Riwayat">
+                        <i class="fas fa-sync-alt text-sm"></i>
+                    </button>
                 </div>
+                <div class="text-[12px] text-slate-500 mt-1.5">Klik untuk pratinjau</div>
             </div> 
             <div id="historyTableContainer" class="overflow-y-auto flex-1 custom-scrollbar bg-white min-h-0">
                 <table class="min-w-full divide-y divide-slate-200 text-left">
@@ -384,56 +382,57 @@
                 
                 html += `
                     <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
-                        <td class="p-2 sm:p-3 align-top border-none">
+                        <td class="p-3 align-top border-none">
                             
                             <!-- KARTU PUBLIKASI -->
-                            <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-1">
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-1">
                                 
-                                <!-- BARIS 1: NAMA & LENCANA -->
+                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS -->
                                 <div class="flex justify-between items-center gap-4 mb-0.5">
-                                    <span class="text-[12px] font-medium text-slate-800 uppercase tracking-wide">
+                                    <span class="text-[13px] font-medium text-slate-800 uppercase tracking-wide">
                                         ${item.namaDosen || '-'}
                                     </span>
-                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[10px] font-bold text-[#b45309] uppercase">
-                                        <i class="fas fa-feather-alt text-[#d97706] text-[10px]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
+                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
+                                        <i class="fas fa-feather-alt text-[#b48633]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
                                     </span>
                                 </div>
                                 
                                 <!-- BARIS 2: JUDUL ARTIKEL -->
-                                <h3 class="text-[15px] sm:text-[16px] font-extrabold text-[#0f172a] leading-snug mb-1.5 pr-2">
+                                <h3 class="text-[16px] font-bold text-[#1e293b] leading-snug mb-1.5 pr-2">
                                     ${item.judulArtikel || '-'}
                                 </h3>
                                 
-                                <!-- BARIS 3: META INFO (Kiri) & TOMBOL (Kanan) -->
+                                <!-- BARIS 3: INFO META & TOMBOL -->
                                 <div class="flex flex-wrap justify-between items-end gap-3 mt-0.5">
                                     
-                                    <!-- Kolom Kiri: Jurnal & Indeksasi -->
+                                    <!-- Kolom Kiri: Jurnal & Indeksasi (Bertingkat) -->
                                     <div class="flex flex-col gap-1.5">
                                         
-                                        <!-- Jurnal, Vol, Tahun -->
-                                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-600 font-normal">
+                                        <!-- Jurnal, Vol, Tahun (Satu Baris) -->
+                                        <div class="flex flex-wrap items-center gap-3 text-[13px] text-slate-700 font-medium">
                                             <span class="flex items-center gap-1.5">
-                                                <i class="far fa-file-alt text-slate-400"></i> ${item.namaJurnal || '-'}
+                                                <i class="fas fa-book text-slate-500"></i> ${item.namaJurnal || '-'}
                                             </span>
                                             <span class="flex items-center gap-1.5">
-                                                <i class="fas fa-book text-slate-400"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
+                                                <i class="fas fa-book-open text-slate-500"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
                                             </span>
                                             <span class="flex items-center gap-1.5">
-                                                <i class="far fa-calendar text-slate-400"></i> ${tahunPublikasi}
+                                                <i class="far fa-calendar text-slate-500"></i> ${tahunPublikasi}
                                             </span>
                                         </div>
                                         
-                                        <!-- Indeksasi (Seragam, tanpa bold/warna khusus) -->
-                                        <div class="flex items-center gap-1.5 text-[12px] text-slate-600 font-normal">
-                                            <i class="far fa-check-circle text-slate-400"></i> 
+                                        <!-- Indeksasi (Satu Baris di Bawahnya - Tanpa warna khusus/bold) -->
+                                        <div class="flex items-center gap-1.5 text-[13px] text-slate-700 font-medium">
+                                            <i class="fas fa-shield-check text-slate-500"></i> 
                                             <span>${item.indeksasi || '-'}</span>
                                         </div>
+                                        
                                     </div>
                                     
-                                    <!-- Kolom Kanan: Tombol -->
+                                    <!-- Kolom Kanan: Tombol Buka Artikel -->
                                     <div class="shrink-0 mt-2 sm:mt-0">
-                                        <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 bg-[#3b71ca] hover:bg-blue-700 text-white text-[11px] font-bold px-3.5 py-1.5 rounded transition-colors shadow-sm">
-                                            BUKA ARTIKEL <i class="fas fa-external-link-square-alt text-[12px]"></i>
+                                        <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 bg-[#3b71ca] hover:bg-blue-700 text-white text-[12px] font-semibold px-4 py-2 rounded-md transition-colors shadow-sm">
+                                            BUKA ARTIKEL <i class="fas fa-external-link-square-alt"></i>
                                         </a>
                                     </div>
                                     
