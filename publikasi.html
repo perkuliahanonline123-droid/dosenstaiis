@@ -380,41 +380,58 @@
             // 2. RENDER HTML (Maksimal 15 Data)
             riwayatArray.slice(0, 15).forEach((item) => {
                 
-                // Ekstrak tahun publikasi dan tambahkan tanda kurung
-                let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '';
-                // Menambahkan spasi dan kurung () jika tahun ada nilainya
-                let displayTahun = tahunPublikasi ? ` (${tahunPublikasi})` : ''; 
+                // Ekstrak tahun publikasi saja untuk ditampilkan terpisah
+                let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '-';
                 
                 html += `
-                    <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100 cursor-pointer" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
-                        <td class="p-4 align-top">
+                    <tr class="group cursor-pointer" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
+                        <td class="p-3 align-top border-none">
                             
-                            <!-- Penyesuaian posisi dan tampilan Penulis disejajarkan dengan Nama Dosen -->
-                            <div class="flex flex-wrap items-center gap-2.5 mb-1">
-                                <span class="text-sm font-bold text-slate-800">${item.namaDosen || '-'}</span>
+                            <!-- KARTU PUBLIKASI (Meniru desain pada gambar) -->
+                            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm group-hover:shadow-md group-hover:border-blue-300 transition-all duration-300 flex flex-col">
                                 
-                                <!-- TAMPILAN "PENULIS PERTAMA" YANG LEBIH ELEGAN & MEWAH -->
-                                <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 border border-amber-300/80 text-[10px] font-extrabold text-amber-800 uppercase tracking-widest shadow-sm ring-1 ring-amber-400/30">
-                                    <i class="fas fa-pen-fancy text-amber-600"></i> ${item.sebagaiPenulis || 'Penulis'}
-                                </span>
+                                <!-- BARIS ATAS: Nama Dosen & Label Penulis -->
+                                <div class="flex justify-between items-start gap-4 mb-2">
+                                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest mt-1">
+                                        ${item.namaDosen || '-'}
+                                    </span>
+                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200/60 text-[10px] font-extrabold text-amber-700 uppercase tracking-widest">
+                                        <i class="fas fa-pen-fancy text-amber-500"></i> ${item.sebagaiPenulis || 'Penulis'}
+                                    </span>
+                                </div>
+                                
+                                <!-- JUDUL ARTIKEL -->
+                                <h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug mb-3 pr-4 group-hover:text-blue-700 transition-colors">
+                                    ${item.judulArtikel || '-'}
+                                </h3>
+                                
+                                <!-- META INFO (Jurnal, Volume, Tahun sejajar) -->
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-medium text-slate-600 mb-4">
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-book text-slate-400 text-sm"></i> ${item.namaJurnal || '-'}
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-book-open text-slate-400 text-sm"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="far fa-calendar-alt text-slate-400 text-sm"></i> ${tahunPublikasi}
+                                    </span>
+                                </div>
+                                
+                                <!-- BARIS BAWAH: Indeksasi & Tombol Buka Artikel -->
+                                <div class="flex flex-wrap justify-between items-center pt-3 border-t border-slate-100 gap-3">
+                                    <div class="flex items-center gap-1.5 text-xs font-bold">
+                                        <i class="fas fa-shield-check text-slate-400 text-sm"></i> 
+                                        <span class="text-amber-600">${item.indeksasi || '-'}</span>
+                                    </div>
+                                    
+                                    <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-[11px] font-bold px-4 py-2.5 rounded-lg transition-all shadow-sm hover:shadow-blue-600/30">
+                                        BUKA ARTIKEL <i class="fas fa-external-link-square-alt text-sm"></i>
+                                    </a>
+                                </div>
+                                
                             </div>
                             
-                            <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel || '-'}</div>
-                            
-                            <!-- Perbaikan sintaks pemanggilan displayTahun dan penghapusan koma setelah Volume -->
-                            <div class="text-[10px] text-slate-500 mt-1">
-                                <i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal || '-'}, Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}${displayTahun}
-                            </div>
-                            
-                            <div class="text-[10px] font-semibold text-emerald-600 mt-1">
-                                <i class="fas fa-certificate mr-1"></i> ${item.indeksasi || '-'}
-                            </div>
-                            
-                            <div class="mt-2">
-                                <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold text-blue-600 hover:underline">
-                                    <i class="fas fa-external-link-alt"></i> Buka Artikel
-                                </a>
-                            </div>
                         </td>
                     </tr>
                 `;
@@ -422,7 +439,7 @@
             
             // Tampilkan pesan jika array kosong
             if (riwayatArray.length === 0) {
-                html = `<tr><td class="p-6 text-center text-xs text-slate-500">Data publikasi tidak ditemukan.</td></tr>`;
+                html = `<tr><td class="p-6 text-center text-sm font-medium text-slate-500">Data publikasi tidak ditemukan.</td></tr>`;
             }
         
             tbody.innerHTML = html;
