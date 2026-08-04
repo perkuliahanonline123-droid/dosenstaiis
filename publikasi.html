@@ -380,55 +380,69 @@
             // 2. RENDER HTML (Maksimal 15 Data)
             riwayatArray.slice(0, 15).forEach((item) => {
                 
-                // Ekstrak tahun publikasi
                 let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '-';
                 
+                // Logika agar teks "Belum Terakreditasi" otomatis berwarna emas (seperti di gambar)
+                let teksIndeksasi = item.indeksasi || '-';
+                if (teksIndeksasi.includes('Belum Terakreditasi')) {
+                    teksIndeksasi = teksIndeksasi.replace('Belum Terakreditasi', '<span class="text-[#b45309] font-bold">Belum Terakreditasi</span>');
+                }
+                
                 html += `
-                    <tr class="group cursor-pointer" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
-                        <td class="p-3 align-top border-none">
+                    <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
+                        <td class="p-2 sm:p-3 align-top border-none">
                             
-                            <!-- KARTU PUBLIKASI (Desain Gambar 1) -->
-                            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm group-hover:shadow-md transition-all duration-300 flex flex-col">
+                            <!-- KARTU PUBLIKASI (Sangat rapat & presisi meniru referensi) -->
+                            <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-1">
                                 
-                                <!-- BARIS ATAS: Nama Dosen & Label Penulis -->
-                                <div class="flex justify-between items-center gap-4 mb-1.5">
-                                    <span class="text-sm font-semibold text-slate-800 uppercase tracking-wide">
+                                <!-- BARIS 1: NAMA & LENCANA -->
+                                <div class="flex justify-between items-center gap-4 mb-0.5">
+                                    <span class="text-[12px] font-medium text-slate-800 uppercase tracking-wide">
                                         ${item.namaDosen || '-'}
                                     </span>
-                                    <!-- Lencana emas pucat dengan ikon bulu (feather) -->
-                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b8862d] uppercase tracking-wide">
-                                        <i class="fas fa-feather-alt"></i> ${item.sebagaiPenulis || 'Penulis'}
+                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[10px] font-bold text-[#b45309] uppercase">
+                                        <i class="fas fa-leaf text-[#d97706] text-[10px]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
                                     </span>
                                 </div>
                                 
-                                <!-- JUDUL ARTIKEL (Gelap & Bold) -->
-                                <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug mb-2 pr-4">
+                                <!-- BARIS 2: JUDUL ARTIKEL -->
+                                <h3 class="text-[15px] sm:text-[16px] font-extrabold text-[#0f172a] leading-snug mb-1.5 pr-2">
                                     ${item.judulArtikel || '-'}
                                 </h3>
                                 
-                                <!-- META INFO (Sejajar tanpa batas bawah) -->
-                                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-slate-700 mb-5">
-                                    <span class="flex items-center gap-1.5">
-                                        <i class="far fa-file-alt text-slate-500"></i> ${item.namaJurnal || '-'}
-                                    </span>
-                                    <span class="flex items-center gap-1.5">
-                                        <i class="fas fa-book-open text-slate-500"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
-                                    </span>
-                                    <span class="flex items-center gap-1.5">
-                                        <i class="far fa-calendar-alt text-slate-500"></i> ${tahunPublikasi}
-                                    </span>
-                                </div>
-                                
-                                <!-- BARIS BAWAH: Indeksasi & Tombol -->
-                                <div class="flex flex-wrap justify-between items-center gap-3">
-                                    <div class="flex items-center gap-1.5 text-[13px] text-slate-800 font-medium">
-                                        <i class="far fa-check-circle text-slate-600"></i> 
-                                        <span>${item.indeksasi || '-'}</span>
+                                <!-- BARIS 3: META INFO (Kiri) & TOMBOL (Kanan) -->
+                                <div class="flex flex-wrap justify-between items-end gap-3 mt-0.5">
+                                    
+                                    <!-- Kolom Kiri: Jurnal & Indeksasi -->
+                                    <div class="flex flex-col gap-1">
+                                        
+                                        <!-- Jurnal, Vol, Tahun -->
+                                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-700 font-medium">
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="far fa-file-alt text-slate-500"></i> ${item.namaJurnal || '-'}
+                                            </span>
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="fas fa-book-open text-slate-500"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
+                                            </span>
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="far fa-calendar text-slate-500"></i> ${tahunPublikasi}
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Indeksasi -->
+                                        <div class="flex items-center gap-1.5 text-[12px] text-slate-700 font-medium">
+                                            <i class="far fa-check-circle text-slate-500"></i> 
+                                            <span>${teksIndeksasi}</span>
+                                        </div>
                                     </div>
                                     
-                                    <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-2 bg-[#3b71ca] hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2.5 rounded-md transition-colors shadow-sm">
-                                        BUKA ARTIKEL <i class="fas fa-external-link-square-alt text-sm"></i>
-                                    </a>
+                                    <!-- Kolom Kanan: Tombol -->
+                                    <div class="shrink-0 mt-2 sm:mt-0">
+                                        <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 bg-[#3b71ca] hover:bg-blue-700 text-white text-[11px] font-bold px-3.5 py-1.5 rounded transition-colors shadow-sm">
+                                            BUKA ARTIKEL <i class="fas fa-external-link-alt text-[11px]"></i>
+                                        </a>
+                                    </div>
+                                    
                                 </div>
                                 
                             </div>
