@@ -370,24 +370,28 @@
             const tbody = document.getElementById('historyBody');
             let html = '';
             riwayatArray.slice(0, 15).forEach((item) => {
-                let dateStr = new Date(item.timestamp).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year:'numeric'});
                 
-                // Mengambil tahun dari kolom tanggalTerbit (jika ada isinya)
+                // Ekstrak tahun publikasi dan tambahkan tanda kurung
                 let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '';
-                // Format spasi sebelum tahun agar tidak menempel dengan kurung tutup
-                let displayTahun = tahunPublikasi ? ` ${tahunPublikasi}` : ''; 
+                // Menambahkan spasi dan kurung () jika tahun ada nilainya
+                let displayTahun = tahunPublikasi ? ` (${tahunPublikasi})` : ''; 
                 
                 html += `
                     <tr class="hover:bg-emerald-50/60 transition-colors border-b border-slate-100 cursor-pointer" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
                         <td class="p-4 align-top">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-[10px] font-bold text-slate-400">${dateStr}</span>
+                            <!-- Tanggal dihapus, hanya menyisakan label peran penulis yang ditaruh di kanan -->
+                            <div class="flex justify-end items-center mb-1">
                                 <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">${item.sebagaiPenulis}</span>
                             </div>
+                            
                             <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
                             <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel}</div>
-                            <!-- Menambahkan variabel ${displayTahun} di akhir info jurnal -->
-                            <div class="text-[10px] text-slate-500 mt-1"><i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal}, Vol. ${item.volume}, No. ${item.nomor}$ {(displayTahun)}</div>
+                            
+                            <!-- Perbaikan sintaks pemanggilan displayTahun dan penghapusan koma setelah Volume -->
+                            <div class="text-[10px] text-slate-500 mt-1">
+                                <i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal}, Vol. ${item.volume} No. ${item.nomor}${displayTahun}
+                            </div>
+                            
                             <div class="text-[10px] font-semibold text-emerald-600 mt-1"><i class="fas fa-certificate mr-1"></i> ${item.indeksasi || '-'}</div>
                             <div class="mt-2">
                                 <a href="${item.linkArtikel}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold text-blue-600 hover:underline"><i class="fas fa-external-link-alt"></i> Buka Artikel</a>
