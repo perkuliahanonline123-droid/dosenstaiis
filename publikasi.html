@@ -387,12 +387,12 @@
                             <!-- KARTU PUBLIKASI -->
                             <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-2">
                                 
-                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS -->
-                                <div class="flex justify-between items-center gap-4">
+                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS (Kembali menyatu berdampingan) -->
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
                                         ${item.namaDosen || '-'}
                                     </span>
-                                    <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
                                         <i class="fas fa-feather-alt text-[#b48633]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
                                     </span>
                                 </div>
