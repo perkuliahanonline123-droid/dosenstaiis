@@ -369,6 +369,15 @@
         function renderTabelRiwayat(riwayatArray) {
             const tbody = document.getElementById('historyBody');
             let html = '';
+        
+            // 1. URUTKAN DATA BERDASARKAN TAHUN TERBIT (TERBARU KE TERLAMA)
+            riwayatArray.sort((a, b) => {
+                const tahunA = a.tanggalTerbit ? new Date(a.tanggalTerbit).getFullYear() : 0;
+                const tahunB = b.tanggalTerbit ? new Date(b.tanggalTerbit).getFullYear() : 0;
+                return tahunB - tahunA; // Urutan Descending
+            });
+        
+            // 2. RENDER HTML (Maksimal 15 Data)
             riwayatArray.slice(0, 15).forEach((item) => {
                 
                 // Ekstrak tahun publikasi dan tambahkan tanda kurung
@@ -381,25 +390,38 @@
                         <td class="p-4 align-top">
                             <!-- Tanggal dihapus, hanya menyisakan label peran penulis yang ditaruh di kanan -->
                             <div class="flex justify-end items-center mb-1">
-                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">${item.sebagaiPenulis}</span>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">
+                                    ${item.sebagaiPenulis || 'Penulis'}
+                                </span>
                             </div>
                             
-                            <div class="text-sm font-bold text-slate-800">${item.namaDosen}</div>
-                            <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel}</div>
+                            <div class="text-sm font-bold text-slate-800">${item.namaDosen || '-'}</div>
+                            <div class="text-xs text-slate-600 mt-1 font-semibold">${item.judulArtikel || '-'}</div>
                             
                             <!-- Perbaikan sintaks pemanggilan displayTahun dan penghapusan koma setelah Volume -->
                             <div class="text-[10px] text-slate-500 mt-1">
-                                <i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal}, Vol. ${item.volume}, No. ${item.nomor}${displayTahun}
+                                <i class="fas fa-book mr-1 text-emerald-500"></i> ${item.namaJurnal || '-'}, Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}${displayTahun}
                             </div>
                             
-                            <div class="text-[10px] font-semibold text-emerald-600 mt-1"><i class="fas fa-certificate mr-1"></i> ${item.indeksasi || '-'}</div>
+                            <div class="text-[10px] font-semibold text-emerald-600 mt-1">
+                                <i class="fas fa-certificate mr-1"></i> ${item.indeksasi || '-'}
+                            </div>
+                            
                             <div class="mt-2">
-                                <a href="${item.linkArtikel}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold text-blue-600 hover:underline"><i class="fas fa-external-link-alt"></i> Buka Artikel</a>
+                                <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold text-blue-600 hover:underline">
+                                    <i class="fas fa-external-link-alt"></i> Buka Artikel
+                                </a>
                             </div>
                         </td>
                     </tr>
                 `;
             });
+            
+            // Tampilkan pesan jika array kosong
+            if (riwayatArray.length === 0) {
+                html = `<tr><td class="p-6 text-center text-xs text-slate-500">Data publikasi tidak ditemukan.</td></tr>`;
+            }
+        
             tbody.innerHTML = html;
         }
         function tampilkanPratinjau(index) {
