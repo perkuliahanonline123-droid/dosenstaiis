@@ -382,17 +382,11 @@
                 
                 let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '-';
                 
-                // Logika agar teks "Belum Terakreditasi" otomatis berwarna emas (seperti di gambar)
-                let teksIndeksasi = item.indeksasi || '-';
-                if (teksIndeksasi.includes('Belum Terakreditasi')) {
-                    teksIndeksasi = teksIndeksasi.replace('Belum Terakreditasi', '<span class="text-[#b45309] font-bold">Belum Terakreditasi</span>');
-                }
-                
                 html += `
                     <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
                         <td class="p-2 sm:p-3 align-top border-none">
                             
-                            <!-- KARTU PUBLIKASI (Sangat rapat & presisi meniru referensi) -->
+                            <!-- KARTU PUBLIKASI -->
                             <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-1">
                                 
                                 <!-- BARIS 1: NAMA & LENCANA -->
@@ -401,7 +395,7 @@
                                         ${item.namaDosen || '-'}
                                     </span>
                                     <span class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[10px] font-bold text-[#b45309] uppercase">
-                                        <i class="fas fa-leaf text-[#d97706] text-[10px]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
+                                        <i class="fas fa-feather-alt text-[#d97706] text-[10px]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
                                     </span>
                                 </div>
                                 
@@ -414,32 +408,32 @@
                                 <div class="flex flex-wrap justify-between items-end gap-3 mt-0.5">
                                     
                                     <!-- Kolom Kiri: Jurnal & Indeksasi -->
-                                    <div class="flex flex-col gap-1">
+                                    <div class="flex flex-col gap-1.5">
                                         
                                         <!-- Jurnal, Vol, Tahun -->
-                                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-700 font-medium">
+                                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-600 font-normal">
                                             <span class="flex items-center gap-1.5">
-                                                <i class="far fa-file-alt text-slate-500"></i> ${item.namaJurnal || '-'}
+                                                <i class="far fa-file-alt text-slate-400"></i> ${item.namaJurnal || '-'}
                                             </span>
                                             <span class="flex items-center gap-1.5">
-                                                <i class="fas fa-book-open text-slate-500"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
+                                                <i class="fas fa-book text-slate-400"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
                                             </span>
                                             <span class="flex items-center gap-1.5">
-                                                <i class="far fa-calendar text-slate-500"></i> ${tahunPublikasi}
+                                                <i class="far fa-calendar text-slate-400"></i> ${tahunPublikasi}
                                             </span>
                                         </div>
                                         
-                                        <!-- Indeksasi -->
-                                        <div class="flex items-center gap-1.5 text-[12px] text-slate-700 font-medium">
-                                            <i class="far fa-check-circle text-slate-500"></i> 
-                                            <span>${teksIndeksasi}</span>
+                                        <!-- Indeksasi (Seragam, tanpa bold/warna khusus) -->
+                                        <div class="flex items-center gap-1.5 text-[12px] text-slate-600 font-normal">
+                                            <i class="far fa-check-circle text-slate-400"></i> 
+                                            <span>${item.indeksasi || '-'}</span>
                                         </div>
                                     </div>
                                     
                                     <!-- Kolom Kanan: Tombol -->
                                     <div class="shrink-0 mt-2 sm:mt-0">
                                         <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 bg-[#3b71ca] hover:bg-blue-700 text-white text-[11px] font-bold px-3.5 py-1.5 rounded transition-colors shadow-sm">
-                                            BUKA ARTIKEL <i class="fas fa-external-link-alt text-[11px]"></i>
+                                            BUKA ARTIKEL <i class="fas fa-external-link-square-alt text-[12px]"></i>
                                         </a>
                                     </div>
                                     
