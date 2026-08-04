@@ -392,8 +392,10 @@
                             <!-- Penyesuaian posisi dan tampilan Penulis disejajarkan dengan Nama Dosen -->
                             <div class="flex flex-wrap items-center gap-2.5 mb-1">
                                 <span class="text-sm font-bold text-slate-800">${item.namaDosen || '-'}</span>
-                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
-                                    <i class="fas fa-pen-nib text-slate-400"></i> ${item.sebagaiPenulis || 'Penulis'}
+                                
+                                <!-- TAMPILAN "PENULIS PERTAMA" YANG LEBIH ELEGAN & MEWAH -->
+                                <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 border border-amber-300/80 text-[10px] font-extrabold text-amber-800 uppercase tracking-widest shadow-sm ring-1 ring-amber-400/30">
+                                    <i class="fas fa-pen-fancy text-amber-600"></i> ${item.sebagaiPenulis || 'Penulis'}
                                 </span>
                             </div>
                             
