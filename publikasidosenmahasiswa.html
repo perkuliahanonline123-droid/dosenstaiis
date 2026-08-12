@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#065f46">
+    <title>Formulir Publikasi Dosen</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    boxShadow: { 'timbul': '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .a4-container {
+            width: 210mm;
+            max-width: 100%;
+            padding: 20mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-sizing: border-box;
+            overflow-x: auto;
+        }
+        
+        /* Agar tabel di modal HP bisa di-scroll secara horizontal jika terlalu lebar */
+        .a4-container table {
+            min-width: 600px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased bg-slate-50">
+
+    <!-- HEADER UTAMA -->
+    <header class="w-full bg-emerald-800 text-white px-6 md:px-10 py-10 rounded-b-[1.5rem] shadow-timbul relative z-10">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full mx-auto">
+            <div>
+                <span class="text-sm md:text-base font-bold tracking-[0.2em] text-emerald-300 uppercase mb-3 block">Dashboard Dosen</span>
+                <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-wide text-white">Pendataan Publikasi Ilmiah</h1>
+                <p class="text-emerald-100 text-base md:text-lg mt-2 max-w-2xl">Lengkapi data artikel jurnal ilmiah yang telah Anda publikasikan beserta riwayatnya.</p>
+            </div>
+            
+            <!-- Navigasi Desktop -->
+            <nav class="hidden md:flex flex-wrap items-center gap-6 text-sm font-bold tracking-wide uppercase">
+                <a href="index.html" class="text-emerald-300 hover:text-white transition-colors">
+                    LKD
+                </a>
+                <a href="publikasi.html" class="text-white">
+                    Publikasi
+                </a>
+                <a href="rps.html" class="text-emerald-300 hover:text-white transition-colors">
+                    RPS
+                </a>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- BOTTOM NAVIGATION BAR (Khusus HP) -->
+    <nav class="fixed bottom-0 left-0 z-50 w-full h-[72px] bg-white border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden flex justify-around items-center text-[10px] font-bold tracking-widest uppercase pb-1">
+        
+        <!-- Menu 1: LKD (Tidak Aktif) -->
+        <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-emerald-600 transition-colors">
+            <svg class="w-6 h-6 mb-1.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+            <span>LKD</span>
+        </a>
+    
+        <!-- Menu 2: PUBLIKASI (Aktif -> Warna Hijau) -->
+        <a href="publikasi.html" class="flex flex-col items-center justify-center w-full h-full text-emerald-600">
+            <svg class="w-6 h-6 mb-1.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+            <span>Publikasi</span>
+        </a>
+    
+        <!-- Menu 3: RPS (Tidak Aktif) -->
+        <a href="rps.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-emerald-600 transition-colors">
+            <svg class="w-6 h-6 mb-1.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
+            </svg>
+            <span>RPS</span>
+        </a>
+        
+    </nav>
+
+    <main class="w-full mx-auto px-6 md:px-10 mt-8 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-stretch">
+        
+        <!-- WIDGET STATISTIK PUBLIKASI -->
+        <div class="lg:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Total -->
+            <div onclick="filterRiwayat('all')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Tampilkan Semua">
+                <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex justify-center items-center text-xl shrink-0">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Publikasi</p>
+                    <h3 class="text-2xl font-black text-slate-800 leading-none mt-1" id="stat-total">0</h3>
+                </div>
+            </div>
+            <!-- Scopus -->
+            <div onclick="filterRiwayat('scopus')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Filter Scopus/WoS">
+                <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex justify-center items-center text-xl shrink-0">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Scopus / WoS</p>
+                    <h3 class="text-2xl font-black text-slate-800 leading-none mt-1" id="stat-scopus">0</h3>
+                </div>
+            </div>
+            <!-- Sinta -->
+            <div onclick="filterRiwayat('sinta')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Filter Jurnal Sinta">
+                <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex justify-center items-center text-xl shrink-0">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Jurnal SINTA</p>
+                    <h3 class="text-2xl font-black text-slate-800 leading-none mt-1" id="stat-sinta">0</h3>
+                </div>
+            </div>
+            <!-- Lainnya -->
+            <div onclick="filterRiwayat('lainnya')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1" title="Filter Lainnya">
+                <div class="w-12 h-12 rounded-lg bg-slate-100 text-slate-500 flex justify-center items-center text-xl shrink-0">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Lainnya</p>
+                    <h3 class="text-2xl font-black text-slate-800 leading-none mt-1" id="stat-lainnya">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIWAYAT PUBLIKASI (DIBUAT LEBIH LEBAR: lg:col-span-8) -->
+        <div class="lg:col-span-8 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden flex flex-col h-full">
+            <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 shrink-0">
+                <div class="flex items-center gap-2">
+                    <h2 class="font-bold text-base text-slate-800 uppercase tracking-wide leading-none">Riwayat Publikasi</h2>
+                    <button type="button" id="btn-refresh" onclick="refreshRiwayat()" class="text-slate-400 hover:text-[#3b71ca] transition outline-none" title="Segarkan Riwayat">
+                        <i class="fas fa-sync-alt text-sm"></i>
+                    </button>
+                </div>
+                <div class="text-[12px] text-slate-500 mt-1.5">Klik untuk pratinjau</div>
+            </div> 
+            <div id="historyTableContainer" class="overflow-y-auto flex-1 custom-scrollbar bg-white min-h-0">
+                <table class="min-w-full divide-y divide-slate-200 text-left">
+                    <tbody id="historyBody" class="divide-y divide-slate-100 bg-white">
+                        <tr>
+                            <td class="p-6 text-center text-xs text-slate-500">
+                                <i class="fas fa-spinner fa-spin text-slate-400 mr-2"></i>Memuat riwayat...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- FORMULIR INPUT (DIBUAT LEBIH SEMPIT: lg:col-span-4) -->
+        <div class="lg:col-span-4 bg-white rounded-xl shadow-timbul border border-slate-200 p-6 md:p-8 w-full flex flex-xl flex-col">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-6 border-b border-slate-200 pb-3"><i class="fas fa-edit mr-2"></i>Form Input Publikasi</h2>
+            
+            <form id="formPublikasi" onsubmit="simpanPublikasi(event)" class="space-y-5">
+                
+                <!-- Diubah menjadi lg:grid-cols-1 agar tidak terlalu sempit ke samping -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Nama Dosen <span class="text-emerald-600">*</span></label>
+                        <select id="namaDosen" required class="bg-slate-50 border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="">-- Menghubungkan ke Database... --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Sebagai Penulis <span class="text-emerald-600">*</span></label>
+                        <select id="sebagaiPenulis" required class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="" disabled selected>Pilih Peran...</option>
+                            <option value="Penulis Pertama">Penulis Pertama</option>
+                            <option value="Penulis Korespondensi">Penulis Korespondensi</option>
+                            <option value="Anggota / Penulis Kedua dst">Anggota / Penulis Kedua, dst</option>
+                            <option value="Penulis Tunggal">Penulis Tunggal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Judul Artikel <span class="text-emerald-600">*</span></label>
+                    <!-- Mengubah tipe input ke textarea agar nyaman jika judul artikel sangat panjang di kolom sempit -->
+                    <textarea id="judulArtikel" rows="3" required placeholder="Tuliskan judul artikel secara lengkap..." class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Nama Jurnal <span class="text-emerald-600">*</span></label>
+                    <input type="text" id="namaJurnal" required placeholder="Contoh: Jurnal Ahwal Al-Syakhshiyyah" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                </div>
+
+                <!-- Diubah menjadi lg:grid-cols-1 agar input volume, nomor, tanggal tersusun ke bawah di layar sempit -->
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Volume</label>
+                        <input type="text" id="volume" placeholder="Contoh: 15" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Nomor</label>
+                        <input type="text" id="nomor" placeholder="Contoh: 2" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Tanggal Terbit</label>
+                        <input type="date" id="tanggalTerbit" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <!-- Diubah menjadi lg:grid-cols-1 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Link Artikel Jurnal <span class="text-emerald-600">*</span></label>
+                        <input type="url" id="linkArtikel" required placeholder="https://..." class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Indeksasi Jurnal <span class="text-emerald-600">*</span></label>
+                        <select id="indeksasi" required class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 block w-full p-3 outline-none">
+                            <option value="" disabled selected>Pilih Indeksasi Jurnal...</option>
+                            <option value="Scopus / WoS Q1">Scopus / WoS Q1</option>
+                            <option value="Scopus / WoS Q2">Scopus / WoS Q2</option>
+                            <option value="Scopus / WoS Q3">Scopus / WoS Q3</option>
+                            <option value="Scopus / WoS Q4">Scopus / WoS Q4</option>
+                            <option value="Scopus / WoS No-Q">Scopus / WoS No-Q</option>
+                            <option value="SINTA 1">SINTA 1</option>
+                            <option value="SINTA 2">SINTA 2</option>
+                            <option value="SINTA 3">SINTA 3</option>
+                            <option value="SINTA 4">SINTA 4</option>
+                            <option value="SINTA 5">SINTA 5</option>
+                            <option value="SINTA 6">SINTA 6</option>
+                            <option value="Nasional Belum Terakreditasi">Nasional Belum Terakreditasi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Diubah menjadi lg:grid-cols-1 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-5">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Biaya APC (Rp) <span class="text-[10px] text-slate-400 lowercase font-normal ml-1">Kosongkan jika gratis</span></label>
+                        <input type="text" id="apc" placeholder="Contoh: 500000" class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase text-slate-600">Link Bukti Transfer APC</label>
+                        <input type="url" id="buktiApc" placeholder="https://drive.google.com/..." class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 flex justify-end">
+                    <button type="submit" id="btn-submit" class="w-full md:w-auto justify-center text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-lg text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-md transition-colors">
+                        <i class="fas fa-save"></i> Simpan Publikasi
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+    <footer class="w-full text-center py-6 text-slate-400 text-xs font-semibold tracking-wider mt-auto bg-transparent border-t border-slate-200">
+        &copy; 2026 Layanan Administrasi Akademik
+    </footer>
+
+    <!-- MODAL PRATINJAU -->
+    <div id="modalPratinjau" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4 md:p-8 transition-opacity">
+        <div class="bg-slate-200 rounded-xl shadow-2xl w-full max-w-5xl max-h-full flex flex-col overflow-hidden">
+            <div class="bg-white px-6 py-4 border-b border-slate-200 flex justify-between items-center z-10">
+                <h3 class="font-bold text-slate-700 text-sm tracking-wide uppercase"><i class="fas fa-search mr-2 text-slate-400"></i> Pratinjau Laporan Kinerja</h3>
+                <div class="flex items-center gap-3">
+                    <button onclick="tutupModal()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition-colors uppercase">Tutup</button>
+                    <button id="btn-cetak" onclick="cetakPDF()" class="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors uppercase flex items-center gap-2"><i class="fas fa-download"></i> Simpan PDF</button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-slate-200 custom-scrollbar">
+                <div id="areaCetakPDF" class="a4-container bg-white">
+                    <div style="text-align: center; line-height: 1.1;">
+                        <div style="font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
+                        <div style="font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
+                        <div style="font-size: 18px; font-weight: bold; margin: 1px 0;">جامعة&nbsp;الإمام&nbsp;الشافعي</div>
+                        <div style="font-size: 11px; margin-top: 2px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
+                        <div style="font-size: 11px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+                    </div>
+                    <div style="margin-top: 6px; margin-bottom: 1px; border-bottom: 2.5px solid black;"></div>
+                    <div style="margin-bottom: 8px; border-bottom: 1px solid black;"></div>
+                    <h2 style="font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase;">DATA PUBLIKASI ILMIAH DOSEN</h2>
+                    <div id="kontenPratinjauDinamis" class="text-[12px]"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec';
+        const CACHE_KEY_PUBLIKASI = 'data_publikasi_cache';
+        let riwayatCache = [];
+        let namaDosenAktif = 'Dosen';
+
+        function updateStatistik(riwayatArray) {
+            let total = riwayatArray.length;
+            let scopus = 0;
+            let sinta = 0;
+            let lainnya = 0;
+
+            riwayatArray.forEach(item => {
+                let indeks = (item.indeksasi || '').toLowerCase();
+                if (indeks.includes('scopus') || indeks.includes('wos')) {
+                    scopus++;
+                } else if (indeks.includes('sinta')) {
+                    sinta++;
+                } else {
+                    lainnya++;
+                }
+            });
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-scopus').innerText = scopus;
+            document.getElementById('stat-sinta').innerText = sinta;
+            document.getElementById('stat-lainnya').innerText = lainnya;
+        }
+
+        function renderDataPublikasi(data) {
+            const dropdown = document.getElementById("namaDosen");
+            const valueSebelumnya = dropdown.value; 
+            
+            dropdown.innerHTML = '<option value="" disabled selected>-- Pilih Nama Dosen --</option>';
+            if(data.dosen) {
+                data.dosen.forEach(nama => dropdown.innerHTML += `<option value="${nama}">${nama}</option>`);
+            }
+            if(valueSebelumnya) dropdown.value = valueSebelumnya;
+
+            const tbody = document.getElementById('historyBody');
+            if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
+                riwayatCache = data.riwayatPublikasi;
+                
+                // 1. Perbarui angka di kartu statistik (tetap menghitung total semua data)
+                updateStatistik(riwayatCache);
+
+                // 2. Baca parameter 'filter' dari URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const filterParam = urlParams.get('filter');
+
+                // 3. Terapkan filter jika ada parameter yang cocok, jika tidak tampilkan semua
+                if (filterParam && ['scopus', 'sinta', 'lainnya', 'all'].includes(filterParam.toLowerCase())) {
+                    filterRiwayat(filterParam.toLowerCase());
+                } else {
+                    renderTabelRiwayat(riwayatCache); 
+                }
+
+            } else {
+                tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada data publikasi terdaftar.</td></tr>';
+                updateStatistik([]);
+            }
+        }
+        function renderTabelRiwayat(riwayatArray) {
+            const tbody = document.getElementById('historyBody');
+            let html = '';
+        
+            // 1. URUTKAN DATA BERDASARKAN TAHUN TERBIT (TERBARU KE TERLAMA)
+            riwayatArray.sort((a, b) => {
+                const tahunA = a.tanggalTerbit ? new Date(a.tanggalTerbit).getFullYear() : 0;
+                const tahunB = b.tanggalTerbit ? new Date(b.tanggalTerbit).getFullYear() : 0;
+                return tahunB - tahunA; // Urutan Descending
+            });
+        
+            // 2. RENDER HTML (Maksimal 15 Data)
+            riwayatArray.slice(0, 15).forEach((item) => {
+                
+                let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '-';
+        
+                html += `
+                    <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
+                        <td class="p-2 border-none">
+                            
+                            <!-- KARTU PUBLIKASI -->
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-2">
+                                
+                                <!-- BARIS 1: NAMA DOSEN & LENCANA PENULIS (Kembali menyatu berdampingan) -->
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                                        ${item.namaDosen || '-'}
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fdf3d8] text-[10px] font-bold text-[#b48633] uppercase">
+                                        <i class="fas fa-feather-alt text-[#b48633]"></i> ${item.sebagaiPenulis || 'PENULIS TUNGGAL'}
+                                    </span>
+                                </div>
+                                
+                                <!-- BARIS 2: JUDUL ARTIKEL -->
+                                <h3 class="text-lg font-extrabold text-[#0f172a] leading-tight">
+                                    ${item.judulArtikel || '-'}
+                                </h3>
+                                
+                                <!-- BARIS 3: INFO META & TOMBOL CTA -->
+                                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-1">
+                                    
+                                    <!-- Kolom Kiri: Detail Jurnal, Volume, Tahun & Akreditasi -->
+                                    <div class="flex flex-col gap-1.5 text-xs font-medium text-slate-600">
+                                        
+                                        <!-- Baris Detail Jurnal, Vol, & Tahun -->
+                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="fas fa-book text-slate-400"></i> ${item.namaJurnal || '-'}
+                                            </span>
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="fas fa-book-open text-slate-400"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}
+                                            </span>
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Baris Akreditasi / Indeksasi (Polos tanpa style khusus) -->
+                                        <div class="flex items-center gap-1.5 text-slate-600 font-medium">
+                                            <i class="fas fa-shield-alt text-slate-400"></i> 
+                                            <span>${item.indeksasi || 'Nasional Belum Terakreditasi'}</span>
+                                        </div>
+                                        
+                                    </div>
+                                    
+                                    <!-- Kolom Kanan: Tombol Buka Artikel -->
+                                    <div class="shrink-0">
+                                        <a href="${item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center justify-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors shadow-sm tracking-wider uppercase w-full sm:w-auto">
+                                            BUKA ARTIKEL <i class="fas fa-external-link-alt text-[11px]"></i>
+                                        </a>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Tampilkan pesan jika array kosong
+            if (riwayatArray.length === 0) {
+                html = `<tr><td class="p-6 text-center text-sm font-medium text-slate-500">Data publikasi tidak ditemukan.</td></tr>`;
+            }
+        
+            tbody.innerHTML = html;
+        }
+        function tampilkanPratinjau(index) {
+            const data = riwayatCache[index];
+            if (!data) return;
+
+            if (data.namaDosen) {
+                namaDosenAktif = data.namaDosen.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+            } else {
+                namaDosenAktif = 'Dosen';
+            }
+
+            const detailHTML = `
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tbody>
+                        <tr><td style="width: 30%; padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Nama Dosen</td><td style="width: 70%; padding: 8px 10px; border: 1px solid #cbd5e1;">${data.namaDosen || '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Peran Penulis</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.sebagaiPenulis || '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Judul Artikel</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.judulArtikel || '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Nama Jurnal</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.namaJurnal || '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Volume & Nomor</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">Vol. ${data.volume || '-'}, No. ${data.nomor || '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Indeksasi Jurnal</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.indeksasi || '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Tanggal Terbit</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.tanggalTerbit ? new Date(data.tanggalTerbit).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Tautan Publikasi</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;"><a href="${data.linkArtikel}" target="_blank" style="color: #0284c7; text-decoration: underline;">Buka Jurnal</a></td></tr>
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('kontenPratinjauDinamis').innerHTML = detailHTML;
+            document.getElementById('modalPratinjau').classList.remove('hidden');
+        }
+        function filterRiwayat(kategori) {
+            let filteredData = [];
+            
+            if (kategori === 'all') {
+                filteredData = riwayatCache;
+            } else if (kategori === 'scopus') {
+                filteredData = riwayatCache.filter(item => {
+                    let indeks = (item.indeksasi || '').toLowerCase();
+                    return indeks.includes('scopus') || indeks.includes('wos');
+                });
+            } else if (kategori === 'sinta') {
+                filteredData = riwayatCache.filter(item => {
+                    let indeks = (item.indeksasi || '').toLowerCase();
+                    return indeks.includes('sinta');
+                });
+            } else if (kategori === 'lainnya') {
+                filteredData = riwayatCache.filter(item => {
+                    let indeks = (item.indeksasi || '').toLowerCase();
+                    return !indeks.includes('scopus') && !indeks.includes('wos') && !indeks.includes('sinta');
+                });
+            }
+
+            // Render tabel jika ada data, tampilkan pesan kosong jika tidak ada
+            if(filteredData.length === 0) {
+                document.getElementById('historyBody').innerHTML = `<tr><td class="p-8 text-center text-xs text-slate-400 italic">Tidak ada publikasi yang sesuai untuk kategori ini.</td></tr>`;
+            } else {
+                renderTabelRiwayat(filteredData);
+            }
+        }
+
+        function tutupModal() {
+            document.getElementById('modalPratinjau').classList.add('hidden');
+        }
+
+        function cetakPDF() {
+            const element = document.getElementById('areaCetakPDF');
+            const btn = document.getElementById('btn-cetak');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            // Simpan ukuran dan batas awal elemen
+            const originalWidth = element.style.width;
+            const originalMaxWidth = element.style.maxWidth;
+
+            // Secara paksa kita atur lebar dokumen sebesar A4 standar 
+            // Hal ini untuk menghindari terpotong / layarnya putih saat di-render via smartphone
+            element.style.width = '794px'; 
+            element.style.maxWidth = '794px';
+
+            const opt = {
+                margin:       0, 
+                filename:     `Data_Publikasi_${namaDosenAktif}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    scrollY: 0, // Kunci Utama: memastikan tidak kosong apabila discroll
+                    scrollX: 0
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Kembalikan ukuran asli agar tampilan CSS tidak rusak setelah diunduh
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                // Kembalikan ukuran asli apabila terjadi kegagalan
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+
+                console.error("Gagal membuat PDF: ", err);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert("Terjadi kesalahan saat memproses PDF.");
+            });
+        }
+
+        document.getElementById('modalPratinjau').addEventListener('click', function(e) {
+            if (e.target === this) tutupModal();
+        });
+
+        function fetchDataLatarBelakang() {
+            fetch(SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status !== "gagal") {
+                    localStorage.setItem(CACHE_KEY_PUBLIKASI, JSON.stringify(data)); 
+                    renderDataPublikasi(data);
+                }
+            }).catch(err => console.log("Gagal sinkronisasi data latar belakang."));
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const cachedData = localStorage.getItem(CACHE_KEY_PUBLIKASI);
+            if (cachedData) {
+                try {
+                    const parsedData = JSON.parse(cachedData);
+                    renderDataPublikasi(parsedData); 
+                } catch(e) { console.error("Gagal membaca cache:", e); }
+            }
+            fetchDataLatarBelakang();
+        });
+
+        function refreshRiwayat() {
+            const btnRefresh = document.getElementById("btn-refresh");
+            const icon = btnRefresh.querySelector("i");
+            const tbody = document.getElementById("historyBody");
+
+            icon.classList.add("fa-spin");
+            btnRefresh.disabled = true;
+            tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin text-emerald-600 mr-2"></i>Mengambil data terbaru...</td></tr>`;
+
+            fetch(SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                icon.classList.remove("fa-spin");
+                btnRefresh.disabled = false;
+                
+                if (data.status !== "gagal") {
+                    localStorage.setItem(CACHE_KEY_PUBLIKASI, JSON.stringify(data));
+                    renderDataPublikasi(data);
+                } else {
+                    renderTabelRiwayat(riwayatCache); 
+                    alert("Gagal memuat data: " + data.pesan);
+                }
+            }).catch(err => {
+                icon.classList.remove("fa-spin");
+                btnRefresh.disabled = false;
+                renderTabelRiwayat(riwayatCache);
+                alert("Gagal terhubung ke server.");
+            });
+        }
+
+        function simpanPublikasi(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById("btn-submit");
+            const temp = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...`;
+            btn.disabled = true;
+
+            const formData = new URLSearchParams();
+            formData.append('formType', 'publikasi'); 
+            
+            formData.append('namaDosen', document.getElementById("namaDosen").value);
+            formData.append('sebagaiPenulis', document.getElementById("sebagaiPenulis").value);
+            formData.append('judulArtikel', document.getElementById("judulArtikel").value);
+            formData.append('namaJurnal', document.getElementById("namaJurnal").value);
+            formData.append('volume', document.getElementById("volume").value);
+            formData.append('nomor', document.getElementById("nomor").value);
+            formData.append('tanggalTerbit', document.getElementById("tanggalTerbit").value);
+            formData.append('linkArtikel', document.getElementById("linkArtikel").value);
+            formData.append('indeksasi', document.getElementById("indeksasi").value);
+            formData.append('apc', document.getElementById("apc").value);
+            formData.append('buktiApc', document.getElementById("buktiApc").value);
+
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(resData => {
+                btn.innerHTML = temp;
+                btn.disabled = false;
+                
+                if (resData.status === "sukses") {
+                    alert("Data publikasi berhasil disimpan!");
+                    document.getElementById("formPublikasi").reset();
+                    
+                    document.getElementById('historyBody').innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin text-emerald-600 mr-2"></i>Memperbarui riwayat...</td></tr>';
+                    fetchDataLatarBelakang(); 
+                } else {
+                    alert("Gagal menyimpan data: " + resData.pesan);
+                }
+            }).catch(e => {
+                btn.innerHTML = temp;
+                btn.disabled = false;
+                alert("Kesalahan jaringan saat menyimpan.");
+            });
+        }
+    </script>
+</body>
+    </html>
