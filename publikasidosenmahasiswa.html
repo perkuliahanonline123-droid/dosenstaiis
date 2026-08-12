@@ -210,7 +210,23 @@
             const tbody = document.getElementById('historyBody');
             let html = '';
         
+            // 1. LOGIKA PENGURUTAN: Publikasi di atas, Laporan Penelitian di bawah
             riwayatArray.sort((a, b) => {
+                const volA = (a.volume || a['Volume'] || '-').toString().trim();
+                const noA = (a.nomor || a['Nomor'] || '-').toString().trim();
+                // Jika vol dan no tidak ada, anggap sebagai Laporan Penelitian (Nilai 1)
+                const isLaporanA = (volA === '-' || volA === '') && (noA === '-' || noA === '') ? 1 : 0;
+        
+                const volB = (b.volume || b['Volume'] || '-').toString().trim();
+                const noB = (b.nomor || b['Nomor'] || '-').toString().trim();
+                const isLaporanB = (volB === '-' || volB === '') && (noB === '-' || noB === '') ? 1 : 0;
+        
+                // Pisahkan posisinya (0/Publikasi selalu di atas 1/Laporan)
+                if (isLaporanA !== isLaporanB) {
+                    return isLaporanA - isLaporanB; 
+                }
+        
+                // Jika statusnya sama (sama-sama jurnal atau laporan), urutkan berdasarkan tahun terbit terbaru
                 const tanggalA = a.tanggalTerbit || a['Tanggal Terbit'];
                 const tanggalB = b.tanggalTerbit || b['Tanggal Terbit'];
                 const tahunA = tanggalA ? new Date(tanggalA).getFullYear() : 0;
@@ -218,6 +234,7 @@
                 return tahunB - tahunA; 
             });
         
+            // 2. LOGIKA TAMPILAN
             riwayatArray.slice(0, 15).forEach((item) => {
                 let tanggal = item.tanggalTerbit || item['Tanggal Terbit'];
                 let tahunPublikasi = tanggal ? new Date(tanggal).getFullYear() : '-';
@@ -229,10 +246,34 @@
                 
                 let judul = item.judulArtikel || item['Judul Artikel'] || '-';
                 let jurnal = item.namaJurnal || item['Nama Jurnal'] || '-';
-                let vol = item.volume || item['Volume'] || '-';
-                let no = item.nomor || item['Nomor'] || '-';
+                let vol = (item.volume || item['Volume'] || '-').toString().trim();
+                let no = (item.nomor || item['Nomor'] || '-').toString().trim();
                 let indeks = item.indeksasiJurnal || item['Indeksasi Jurnal'] || item.indeksasi || 'Nasional Belum Terakreditasi';
                 let link = item.linkArtikelJurnal || item['Link Artikel Jurnal'] || item.linkArtikel || '#';
+        
+                // Identifikasi Laporan Penelitian
+                let isLaporan = (vol === '-' || vol === '') && (no === '-' || no === '');
+                
+                let metaInfoHTML = '';
+                let tombolTeks = 'BUKA ARTIKEL';
+
+                // Tampilan dinamis antara Artikel Jurnal vs Laporan Penelitian
+                if (isLaporan) {
+                    tombolTeks = 'BUKA DOKUMEN';
+                    metaInfoHTML = `
+                        <span class="flex items-center gap-1.5 bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded font-bold tracking-wide border border-slate-200">
+                            <i class="fas fa-file-alt text-slate-400"></i> Laporan Penelitian
+                        </span>
+                        <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
+                    `;
+                } else {
+                    let jurnalNameHTML = jurnal !== '-' && jurnal !== '' ? `<span class="flex items-center gap-1.5"><i class="fas fa-book text-slate-400"></i> ${jurnal}</span>` : '';
+                    metaInfoHTML = `
+                        ${jurnalNameHTML}
+                        <span class="flex items-center gap-1.5"><i class="fas fa-book-open text-slate-400"></i> Vol. ${vol}, No. ${no}</span>
+                        <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
+                    `;
+                }
         
                 html += `
                     <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors block w-full" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
@@ -247,20 +288,18 @@
                                     ${judul}
                                 </h3>
                                 <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-1">
-                                    <div class="flex flex-col gap-1.5 text-xs font-medium text-slate-600">
-                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-                                            <span class="flex items-center gap-1.5"><i class="fas fa-book text-slate-400"></i> ${jurnal}</span>
-                                            <span class="flex items-center gap-1.5"><i class="fas fa-book-open text-slate-400"></i> Vol. ${vol}, No. ${no}</span>
-                                            <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
+                                    <div class="flex flex-col gap-2 text-xs font-medium text-slate-600">
+                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                            ${metaInfoHTML}
                                         </div>
-                                        <div class="flex items-center gap-1.5 text-slate-600 font-medium mt-1">
+                                        <div class="flex items-center gap-1.5 text-slate-600 font-medium mt-0.5">
                                             <i class="fas fa-shield-alt text-slate-400"></i> 
                                             <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold tracking-wide">${indeks}</span>
                                         </div>
                                     </div>
                                     <div class="shrink-0">
                                         <a href="${link}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center justify-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors shadow-sm tracking-wider uppercase w-full sm:w-auto">
-                                            BUKA ARTIKEL <i class="fas fa-external-link-alt text-[11px]"></i>
+                                            ${tombolTeks} <i class="fas fa-external-link-alt text-[11px]"></i>
                                         </a>
                                     </div>
                                 </div>
