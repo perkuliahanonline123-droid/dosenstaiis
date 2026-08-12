@@ -300,16 +300,32 @@
             let html = '';
         
             riwayatArray.sort((a, b) => {
-                const tahunA = a.tanggalTerbit ? new Date(a.tanggalTerbit).getFullYear() : 0;
-                const tahunB = b.tanggalTerbit ? new Date(b.tanggalTerbit).getFullYear() : 0;
+                const tanggalA = a.tanggalTerbit || a['Tanggal Terbit'];
+                const tanggalB = b.tanggalTerbit || b['Tanggal Terbit'];
+                const tahunA = tanggalA ? new Date(tanggalA).getFullYear() : 0;
+                const tahunB = tanggalB ? new Date(tanggalB).getFullYear() : 0;
                 return tahunB - tahunA; 
             });
         
             riwayatArray.slice(0, 15).forEach((item) => {
-                let tahunPublikasi = item.tanggalTerbit ? new Date(item.tanggalTerbit).getFullYear() : '-';
+                let tanggal = item.tanggalTerbit || item['Tanggal Terbit'];
+                let tahunPublikasi = tanggal ? new Date(tanggal).getFullYear() : '-';
+                
+                // Mengakomodasi kemungkinan key object menggunakan spasi sesuai header sheet
+                let p1 = item.penulisPertama || item['Penulis Pertama'] || '';
+                let p2 = item.penulisKedua || item['Penulis Kedua'] || '';
+                let p3 = item.penulisKetiga || item['Penulis Ketiga'] || '';
                 
                 // Menggabungkan Penulis Pertama, Kedua, dan Ketiga dengan koma
-                let daftarPenulis = [item.penulisPertama, item.penulisKedua, item.penulisKetiga].filter(Boolean).join(', ');
+                let daftarPenulis = [p1, p2, p3].filter(Boolean).join(', ');
+                
+                // Fallback key untuk data lainnya
+                let judul = item.judulArtikel || item['Judul Artikel'] || '-';
+                let jurnal = item.namaJurnal || item['Nama Jurnal'] || '-';
+                let vol = item.volume || item['Volume'] || '-';
+                let no = item.nomor || item['Nomor'] || '-';
+                let indeks = item.indeksasiJurnal || item['Indeksasi Jurnal'] || item.indeksasi || 'Nasional Belum Terakreditasi';
+                let link = item.linkArtikelJurnal || item['Link Artikel Jurnal'] || item.linkArtikel || '#';
         
                 html += `
                     <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
@@ -321,22 +337,22 @@
                                     </span>
                                 </div>
                                 <h3 class="text-lg font-extrabold text-[#0f172a] leading-tight">
-                                    ${item.judulArtikel || '-'}
+                                    ${judul}
                                 </h3>
                                 <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-1">
                                     <div class="flex flex-col gap-1.5 text-xs font-medium text-slate-600">
                                         <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-                                            <span class="flex items-center gap-1.5"><i class="fas fa-book text-slate-400"></i> ${item.namaJurnal || '-'}</span>
-                                            <span class="flex items-center gap-1.5"><i class="fas fa-book-open text-slate-400"></i> Vol. ${item.volume || '-'}, No. ${item.nomor || '-'}</span>
+                                            <span class="flex items-center gap-1.5"><i class="fas fa-book text-slate-400"></i> ${jurnal}</span>
+                                            <span class="flex items-center gap-1.5"><i class="fas fa-book-open text-slate-400"></i> Vol. ${vol}, No. ${no}</span>
                                             <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
                                         </div>
                                         <div class="flex items-center gap-1.5 text-slate-600 font-medium">
                                             <i class="fas fa-shield-alt text-slate-400"></i> 
-                                            <span>${item.indeksasiJurnal || item.indeksasi || 'Nasional Belum Terakreditasi'}</span>
+                                            <span>${indeks}</span>
                                         </div>
                                     </div>
                                     <div class="shrink-0">
-                                        <a href="${item.linkArtikelJurnal || item.linkArtikel || '#'}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center justify-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors shadow-sm tracking-wider uppercase w-full sm:w-auto">
+                                        <a href="${link}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center justify-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors shadow-sm tracking-wider uppercase w-full sm:w-auto">
                                             BUKA ARTIKEL <i class="fas fa-external-link-alt text-[11px]"></i>
                                         </a>
                                     </div>
@@ -358,8 +374,19 @@
             const data = riwayatCache[index];
             if (!data) return;
 
-            if (data.penulisPertama) {
-                namaDosenAktif = data.penulisPertama.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+            let p1 = data.penulisPertama || data['Penulis Pertama'] || '';
+            let p2 = data.penulisKedua || data['Penulis Kedua'] || '-';
+            let p3 = data.penulisKetiga || data['Penulis Ketiga'] || '-';
+            let judul = data.judulArtikel || data['Judul Artikel'] || '-';
+            let jurnal = data.namaJurnal || data['Nama Jurnal'] || '-';
+            let vol = data.volume || data['Volume'] || '-';
+            let no = data.nomor || data['Nomor'] || '-';
+            let indeks = data.indeksasiJurnal || data['Indeksasi Jurnal'] || data.indeksasi || '-';
+            let link = data.linkArtikelJurnal || data['Link Artikel Jurnal'] || data.linkArtikel || '#';
+            let tanggal = data.tanggalTerbit || data['Tanggal Terbit'];
+
+            if (p1) {
+                namaDosenAktif = p1.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
             } else {
                 namaDosenAktif = 'Dosen_Mahasiswa';
             }
@@ -367,15 +394,15 @@
             const detailHTML = `
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                     <tbody>
-                        <tr><td style="width: 30%; padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Penulis Pertama</td><td style="width: 70%; padding: 8px 10px; border: 1px solid #cbd5e1;">${data.penulisPertama || '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Penulis Kedua</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.penulisKedua || '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Penulis Ketiga</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.penulisKetiga || '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Judul Artikel</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.judulArtikel || '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Nama Jurnal</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.namaJurnal || '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Volume & Nomor</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">Vol. ${data.volume || '-'}, No. ${data.nomor || '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Indeksasi Jurnal</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.indeksasiJurnal || data.indeksasi || '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Tanggal Terbit</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${data.tanggalTerbit ? new Date(data.tanggalTerbit).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-'}</td></tr>
-                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Tautan Publikasi</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;"><a href="${data.linkArtikelJurnal || data.linkArtikel}" target="_blank" style="color: #0284c7; text-decoration: underline;">Buka Jurnal</a></td></tr>
+                        <tr><td style="width: 30%; padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Penulis Pertama</td><td style="width: 70%; padding: 8px 10px; border: 1px solid #cbd5e1;">${p1 || '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Penulis Kedua</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${p2}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Penulis Ketiga</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${p3}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Judul Artikel</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${judul}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Nama Jurnal</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${jurnal}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Volume & Nomor</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">Vol. ${vol}, No. ${no}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Indeksasi Jurnal</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${indeks}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Tanggal Terbit</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;">${tanggal ? new Date(tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-'}</td></tr>
+                        <tr><td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: bold; background-color: #f8fafc;">Tautan Publikasi</td><td style="padding: 8px 10px; border: 1px solid #cbd5e1;"><a href="${link}" target="_blank" style="color: #0284c7; text-decoration: underline;">Buka Jurnal</a></td></tr>
                     </tbody>
                 </table>
             `;
@@ -383,7 +410,6 @@
             document.getElementById('kontenPratinjauDinamis').innerHTML = detailHTML;
             document.getElementById('modalPratinjau').classList.remove('hidden');
         }
-
         function filterRiwayat(kategori) {
             let filteredData = [];
             
