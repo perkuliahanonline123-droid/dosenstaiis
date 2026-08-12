@@ -148,10 +148,15 @@
                 }
             });
 
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-scopus').innerText = scopus;
-            document.getElementById('stat-sinta').innerText = sinta;
-            document.getElementById('stat-lainnya').innerText = lainnya;
+            const statTotal = document.getElementById('stat-total');
+            const statScopus = document.getElementById('stat-scopus');
+            const statSinta = document.getElementById('stat-sinta');
+            const statLainnya = document.getElementById('stat-lainnya');
+            
+            if(statTotal) statTotal.innerText = total;
+            if(statScopus) statScopus.innerText = scopus;
+            if(statSinta) statSinta.innerText = sinta;
+            if(statLainnya) statLainnya.innerText = lainnya;
         }
 
         function renderDataPublikasi(data) {
@@ -168,7 +173,8 @@
 
             const tbody = document.getElementById('historyBody');
             if(data.riwayatPublikasi && data.riwayatPublikasi.length > 0) {
-                riwayatCache = data.riwayatPublikasi;
+                // Gunakan spread operator untuk menghindari referensi mutasi array asli yang tersimpan di memori
+                riwayatCache = [...data.riwayatPublikasi]; 
                 updateStatistik(riwayatCache);
 
                 const urlParams = new URLSearchParams(window.location.search);
@@ -177,7 +183,7 @@
                 if (filterParam && ['scopus', 'sinta', 'lainnya', 'all'].includes(filterParam.toLowerCase())) {
                     filterRiwayat(filterParam.toLowerCase());
                 } else {
-                    renderTabelRiwayat(riwayatCache); 
+                    renderTabelRiwayat([...riwayatCache]); 
                 }
             } else {
                 tbody.innerHTML = '<tr><td class="p-5 text-center text-xs text-slate-400">Belum ada data publikasi terdaftar.</td></tr>';
@@ -193,19 +199,16 @@
             riwayatArray.sort((a, b) => {
                 const volA = (a.volume || a['Volume'] || '-').toString().trim();
                 const noA = (a.nomor || a['Nomor'] || '-').toString().trim();
-                // Jika vol dan no tidak ada, anggap sebagai Laporan Penelitian (Nilai 1)
                 const isLaporanA = (volA === '-' || volA === '') && (noA === '-' || noA === '') ? 1 : 0;
         
                 const volB = (b.volume || b['Volume'] || '-').toString().trim();
                 const noB = (b.nomor || b['Nomor'] || '-').toString().trim();
                 const isLaporanB = (volB === '-' || volB === '') && (noB === '-' || noB === '') ? 1 : 0;
         
-                // Pisahkan posisinya (0/Publikasi selalu di atas 1/Laporan)
                 if (isLaporanA !== isLaporanB) {
                     return isLaporanA - isLaporanB; 
                 }
         
-                // Jika statusnya sama (sama-sama jurnal atau laporan), urutkan berdasarkan tahun terbit terbaru
                 const tanggalA = a.tanggalTerbit || a['Tanggal Terbit'];
                 const tanggalB = b.tanggalTerbit || b['Tanggal Terbit'];
                 const tahunA = tanggalA ? new Date(tanggalA).getFullYear() : 0;
@@ -213,7 +216,7 @@
                 return tahunB - tahunA; 
             });
         
-            // 2. LOGIKA TAMPILAN
+            // 2. LOGIKA TAMPILAN (Limit 15 untuk optimasi render)
             riwayatArray.slice(0, 15).forEach((item) => {
                 let tanggal = item.tanggalTerbit || item['Tanggal Terbit'];
                 let tahunPublikasi = tanggal ? new Date(tanggal).getFullYear() : '-';
@@ -230,14 +233,12 @@
                 let indeks = item.indeksasiJurnal || item['Indeksasi Jurnal'] || item.indeksasi || 'Nasional Belum Terakreditasi';
                 let link = item.linkArtikelJurnal || item['Link Artikel Jurnal'] || item.linkArtikel || '#';
         
-                // Identifikasi Laporan Penelitian
                 let isLaporan = (vol === '-' || vol === '') && (no === '-' || no === '');
                 
                 let metaInfoHTML = '';
-                let indeksHTML = ''; // Variabel baru untuk menampung lencana indeksasi
+                let indeksHTML = ''; 
                 let tombolTeks = 'BUKA ARTIKEL';
 
-                // Tampilan dinamis antara Artikel Jurnal vs Laporan Penelitian
                 if (isLaporan) {
                     tombolTeks = 'BUKA DOKUMEN';
                     metaInfoHTML = `
@@ -246,7 +247,6 @@
                         </span>
                         <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
                     `;
-                    // indeksHTML dibiarkan kosong agar tidak muncul di Laporan
                 } else {
                     let jurnalNameHTML = jurnal !== '-' && jurnal !== '' ? `<span class="flex items-center gap-1.5"><i class="fas fa-book text-slate-400"></i> ${jurnal}</span>` : '';
                     metaInfoHTML = `
@@ -255,7 +255,6 @@
                         <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
                     `;
                     
-                    // Tampilkan lencana indeksasi hanya jika BUKAN Laporan
                     indeksHTML = `
                         <div class="flex items-center gap-1.5 text-slate-600 font-medium mt-0.5">
                             <i class="fas fa-shield-alt text-slate-400"></i> 
@@ -301,6 +300,7 @@
         
             tbody.innerHTML = html;
         }
+
         function tampilkanPratinjau(index) {
             const data = riwayatCache[index];
             if (!data) return;
@@ -367,7 +367,8 @@
             if(filteredData.length === 0) {
                 document.getElementById('historyBody').innerHTML = `<tr><td class="p-8 text-center text-xs text-slate-400 italic">Tidak ada publikasi yang sesuai untuk kategori ini.</td></tr>`;
             } else {
-                renderTabelRiwayat(filteredData);
+                // Selalu salin data menggunakan spread operator saat rendering agar aman dari mutasi
+                renderTabelRiwayat([...filteredData]);
             }
         }
 
@@ -430,8 +431,16 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status !== "gagal") {
-                    localStorage.setItem(CACHE_KEY_PUBLIKASI, JSON.stringify(data)); 
-                    renderDataPublikasi(data);
+                    const newDataString = JSON.stringify(data);
+                    const currentCache = localStorage.getItem(CACHE_KEY_PUBLIKASI);
+                    
+                    // SENTUHAN AKHIR (ANTI-LEMOT & ANTI-FLICKER):
+                    // Hanya lakukan update localStorage dan render ulang JIKA data benar-benar berubah dari server.
+                    // Ini mencegah layar "berkedip" jika tidak ada yang berubah di Google Sheets.
+                    if (currentCache !== newDataString) {
+                        localStorage.setItem(CACHE_KEY_PUBLIKASI, newDataString); 
+                        renderDataPublikasi(data);
+                    }
                 }
             }).catch(err => {
                 console.warn("Gagal sinkronisasi data latar belakang:", err);
@@ -446,6 +455,7 @@
                     renderDataPublikasi(parsedData); 
                 } catch(e) { console.error("Gagal membaca cache:", e); }
             }
+            // Walaupun sudah render dari cache super cepat, kita tetap ambil data terbaru diam-diam di background
             fetchDataLatarBelakang();
         });
 
@@ -456,7 +466,8 @@
 
             icon.classList.add("fa-spin");
             btnRefresh.disabled = true;
-            tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin text-emerald-600 mr-2"></i>Mengambil data terbaru...</td></tr>`;
+            // Ubah indikator menjadi lebih minimalis agar tabel tidak hilang sepenuhnya jika tidak diperlukan
+            tbody.innerHTML = `<tr><td class="p-5 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin text-emerald-600 mr-2"></i>Menyegarkan dari server...</td></tr>`;
 
             fetch(SCRIPT_URL)
             .then(res => res.json())
@@ -468,13 +479,13 @@
                     localStorage.setItem(CACHE_KEY_PUBLIKASI, JSON.stringify(data));
                     renderDataPublikasi(data);
                 } else {
-                    renderTabelRiwayat(riwayatCache); 
+                    renderTabelRiwayat([...riwayatCache]); 
                     alert("Gagal memuat data: " + data.pesan);
                 }
             }).catch(err => {
                 icon.classList.remove("fa-spin");
                 btnRefresh.disabled = false;
-                renderTabelRiwayat(riwayatCache);
+                renderTabelRiwayat([...riwayatCache]);
                 alert("Gagal terhubung ke server. Periksa koneksi internet Anda.");
                 console.error(err);
             });
