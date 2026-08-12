@@ -75,26 +75,6 @@
 
     <main class="w-full mx-auto px-6 md:px-10 mt-8 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-stretch">
         
-        <!-- WIDGET STATISTIK PUBLIKASI -->
-        <div class="lg:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div onclick="filterRiwayat('all')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
-                <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex justify-center items-center text-xl shrink-0"><i class="fas fa-book"></i></div>
-                <div><p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Publikasi</p><h3 class="text-2xl font-black text-slate-800 mt-1" id="stat-total">0</h3></div>
-            </div>
-            <div onclick="filterRiwayat('scopus')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
-                <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex justify-center items-center text-xl shrink-0"><i class="fas fa-globe"></i></div>
-                <div><p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Scopus / WoS</p><h3 class="text-2xl font-black text-slate-800 mt-1" id="stat-scopus">0</h3></div>
-            </div>
-            <div onclick="filterRiwayat('sinta')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
-                <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex justify-center items-center text-xl shrink-0"><i class="fas fa-certificate"></i></div>
-                <div><p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Jurnal SINTA</p><h3 class="text-2xl font-black text-slate-800 mt-1" id="stat-sinta">0</h3></div>
-            </div>
-            <div onclick="filterRiwayat('lainnya')" class="cursor-pointer bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
-                <div class="w-12 h-12 rounded-lg bg-slate-100 text-slate-500 flex justify-center items-center text-xl shrink-0"><i class="fas fa-file-alt"></i></div>
-                <div><p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Lainnya</p><h3 class="text-2xl font-black text-slate-800 mt-1" id="stat-lainnya">0</h3></div>
-            </div>
-        </div>
-
         <!-- RIWAYAT PUBLIKASI -->
         <div class="lg:col-span-12 bg-white rounded-xl shadow-timbul border border-slate-200 overflow-hidden flex flex-col h-full w-full">
             <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 shrink-0">
@@ -255,6 +235,7 @@
                 let isLaporan = (vol === '-' || vol === '') && (no === '-' || no === '');
                 
                 let metaInfoHTML = '';
+                let indeksHTML = ''; // Variabel baru untuk menampung lencana indeksasi
                 let tombolTeks = 'BUKA ARTIKEL';
 
                 // Tampilan dinamis antara Artikel Jurnal vs Laporan Penelitian
@@ -266,12 +247,21 @@
                         </span>
                         <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
                     `;
+                    // indeksHTML dibiarkan kosong agar tidak muncul di Laporan
                 } else {
                     let jurnalNameHTML = jurnal !== '-' && jurnal !== '' ? `<span class="flex items-center gap-1.5"><i class="fas fa-book text-slate-400"></i> ${jurnal}</span>` : '';
                     metaInfoHTML = `
                         ${jurnalNameHTML}
                         <span class="flex items-center gap-1.5"><i class="fas fa-book-open text-slate-400"></i> Vol. ${vol}, No. ${no}</span>
                         <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-slate-400"></i> ${tahunPublikasi}</span>
+                    `;
+                    
+                    // Tampilkan lencana indeksasi hanya jika BUKAN Laporan
+                    indeksHTML = `
+                        <div class="flex items-center gap-1.5 text-slate-600 font-medium mt-0.5">
+                            <i class="fas fa-shield-alt text-slate-400"></i> 
+                            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold tracking-wide">${indeks}</span>
+                        </div>
                     `;
                 }
         
@@ -292,10 +282,7 @@
                                         <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                                             ${metaInfoHTML}
                                         </div>
-                                        <div class="flex items-center gap-1.5 text-slate-600 font-medium mt-0.5">
-                                            <i class="fas fa-shield-alt text-slate-400"></i> 
-                                            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold tracking-wide">${indeks}</span>
-                                        </div>
+                                        ${indeksHTML}
                                     </div>
                                     <div class="shrink-0">
                                         <a href="${link}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center justify-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors shadow-sm tracking-wider uppercase w-full sm:w-auto">
@@ -315,7 +302,6 @@
         
             tbody.innerHTML = html;
         }
-
         function tampilkanPratinjau(index) {
             const data = riwayatCache[index];
             if (!data) return;
