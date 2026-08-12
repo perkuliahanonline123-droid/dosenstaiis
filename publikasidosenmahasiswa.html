@@ -212,30 +212,39 @@
     <!-- MODAL PRATINJAU -->
     <div id="modalPratinjau" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4 md:p-8 transition-opacity">
         <div class="bg-slate-200 rounded-xl shadow-2xl w-full max-w-5xl max-h-full flex flex-col overflow-hidden">
-            <div class="bg-white px-6 py-4 border-b border-slate-200 flex justify-between items-center z-10">
-                <h3 class="font-bold text-slate-700 text-sm tracking-wide uppercase"><i class="fas fa-search mr-2 text-slate-400"></i> Pratinjau Laporan Kinerja</h3>
-                <div class="flex items-center gap-3">
-                    <button onclick="tutupModal()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition-colors uppercase">Tutup</button>
-                    <button id="btn-cetak" onclick="cetakPDF()" class="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors uppercase flex items-center gap-2"><i class="fas fa-download"></i> Simpan PDF</button>
-                </div>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-slate-200 custom-scrollbar">
-                <div id="areaCetakPDF" class="a4-container bg-white">
-                    <div style="text-align: center; line-height: 1.1;">
-                        <div style="font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
-                        <div style="font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
-                        <div style="font-size: 18px; font-weight: bold; margin: 1px 0;">جامعة الإمام الشافعي</div>
-                        <div style="font-size: 11px; margin-top: 2px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
-                        <div style="font-size: 11px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
-                    </div>
-                    <div style="margin-top: 6px; margin-bottom: 1px; border-bottom: 2.5px solid black;"></div>
-                    <div style="margin-bottom: 8px; border-bottom: 1px solid black;"></div>
-                    <h2 style="font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase;">DATA PUBLIKASI ILMIAH DOSEN & MAHASISWA</h2>
-                    <div id="kontenPratinjauDinamis" class="text-[12px]"></div>
-                </div>
+            <div class="w-full mt-8"> 
+
+    <!-- BAGIAN RIWAYAT (Sekarang akan melebar penuh menempati 100% ruang) -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col w-full">
+        
+        <!-- Header Riwayat -->
+        <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <div>
+                <!-- NAMA JUDUL SUDAH DIGANTI -->
+                <h2 class="text-sm font-bold text-slate-800 tracking-wider uppercase flex items-center gap-2">
+                    RIWAYAT PENELITIAN DOSEN BERSAMA MAHASISWA
+                    <button onclick="muatData()" class="text-slate-400 hover:text-[#15803d] transition-colors" title="Muat Ulang Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </h2>
+                <p class="text-xs text-slate-500 mt-1">Klik untuk pratinjau</p>
             </div>
         </div>
+
+        <!-- Tabel / List Riwayat (Pastikan id="historyBody" tetap ada untuk JavaScript) -->
+        <div class="p-6">
+            <table class="w-full text-left border-collapse">
+                <tbody id="historyBody" class="flex flex-col gap-4">
+                    <!-- Data riwayat dirender di sini oleh JavaScript -->
+                    <tr>
+                        <td class="text-center py-4 text-slate-500">Memuat data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+
+</div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPo1JWmgUkEs2q6ixf-zbfbOxEAVfOl8IaabWF1IKzR2ZtaKJowgkBq0cqMcU0FsBOpg/exec?sheetName=Publikasi Dosen bersama Mahasiswa';
