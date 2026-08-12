@@ -241,9 +241,9 @@
                 let link = item.linkArtikelJurnal || item['Link Artikel Jurnal'] || item.linkArtikel || '#';
         
                 html += `
-                    <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors w-full" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
-                        <td class="p-0 border-none w-full">
-                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-2">
+                    <tr class="group cursor-pointer hover:bg-slate-50/50 transition-colors block w-full" onclick="tampilkanPratinjau(${riwayatCache.indexOf(item)})">
+                        <td class="p-0 border-none block w-full">
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow flex flex-col gap-2 w-full">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
                                         <i class="fas fa-users text-emerald-600 mr-1.5"></i> ${daftarPenulis || '-'}
